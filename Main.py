@@ -4,6 +4,7 @@ import Tetris_Helper as tH
 board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
 camera = uvage.Camera(tH.scene_width, tH.scene_height)
 my_tetrimino = tH.SBlock()
+game_over = False
 fps = 30
 
 
@@ -60,6 +61,7 @@ frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0}
 frames_to_move_on_ground = 25
 current_frames_on_ground = 0
 
+
 def tick():
     global my_tetrimino
     global animation_timer
@@ -67,46 +69,49 @@ def tick():
     global frames_after_each_input
     global frames_to_move_on_ground
     global current_frames_on_ground
+    global game_over
 
-    if animation_timer == 360:
-        animation_timer = 0
-
-    get_input(my_tetrimino, frames_after_each_input)
-
-    if uvage.is_pressing("space"):
-        if frames_after_each_input["space"] == 0:
-            my_tetrimino.center_position[0] = my_tetrimino.get_ghost(board).center_position[0]
-            my_tetrimino.center_position[1] = my_tetrimino.get_ghost(board).center_position[1]
-            my_tetrimino.add_to_board(board)
-            tH.check_clear_lines(board)
-            my_tetrimino = tH.get_next_tetrimino()
-            frames_after_each_input["space"] += 1
-        elif frames_after_each_input["space"] == 5:
-            frames_after_each_input["space"] = 0
-        else:
-            frames_after_each_input["space"] += 1
-    else:
-        frames_after_each_input["space"] = 0
-
-    if not my_tetrimino.center_position[1] == my_tetrimino.get_ghost(board).center_position[1]:
-        if animation_timer % frames_between_move_down == 0:
-            if not my_tetrimino.move_down(board):
-                my_tetrimino = tH.get_next_tetrimino()
+    if not game_over:
+        if animation_timer == 360:
             animation_timer = 0
-    else:
-        if current_frames_on_ground < frames_to_move_on_ground:
-            current_frames_on_ground += 1
-        elif current_frames_on_ground == frames_to_move_on_ground:
-            if not my_tetrimino.move_down(board):
+
+        get_input(my_tetrimino, frames_after_each_input)
+
+        if uvage.is_pressing("space"):
+            if frames_after_each_input["space"] == 0:
+                my_tetrimino.center_position[0] = my_tetrimino.get_ghost(board).center_position[0]
+                my_tetrimino.center_position[1] = my_tetrimino.get_ghost(board).center_position[1]
+                my_tetrimino.add_to_board(board)
+                tH.check_clear_lines(board)
                 my_tetrimino = tH.get_next_tetrimino()
-            current_frames_on_ground = 0
+                game_over = my_tetrimino.check_game_over(board)
+                frames_after_each_input["space"] += 1
+            elif frames_after_each_input["space"] == 5:
+                frames_after_each_input["space"] = 0
+            else:
+                frames_after_each_input["space"] += 1
+        else:
+            frames_after_each_input["space"] = 0
 
-    camera.clear([0, 0, 0])
-    tH.draw_board(board, my_tetrimino, camera)
-    #my_tetrimino.rotate()
-    camera.display()
-    animation_timer += 1
+        if not my_tetrimino.center_position[1] == my_tetrimino.get_ghost(board).center_position[1]:
+            if animation_timer % frames_between_move_down == 0:
+                if not my_tetrimino.move_down(board):
+                    my_tetrimino = tH.get_next_tetrimino()
+                    game_over = my_tetrimino.check_game_over(board)
+                animation_timer = 0
+        else:
+            if current_frames_on_ground < frames_to_move_on_ground:
+                current_frames_on_ground += 1
+            elif current_frames_on_ground == frames_to_move_on_ground:
+                if not my_tetrimino.move_down(board):
+                    my_tetrimino = tH.get_next_tetrimino()
+                    game_over = my_tetrimino.check_game_over(board)
+                current_frames_on_ground = 0
 
+        camera.clear([0, 0, 0])
+        tH.draw_board(board, my_tetrimino, camera)
+        camera.display()
+        animation_timer += 1
 
 
 uvage.timer_loop(fps, tick)

@@ -39,6 +39,15 @@ class Tetrimino:
         self.block_positions = []
         self.color = [0, 0, 0]
 
+    def check_game_over(self, board):
+        print("ran game over")
+        for i in self.block_positions:
+            if board[int(i[1] + self.center_position[1])][int(i[0] + self.center_position[0])] != blank_color:
+                return True
+            if int(i[1] + self.center_position[1]) < 0:
+                return True
+        return False
+
     def rotate(self, board, direction="clockwise"):
         new_block_positions = []
         for i in range(len(self.block_positions)):
