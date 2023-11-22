@@ -47,6 +47,7 @@ class Tetrimino:
             new_x = int(new_block_position[0] + self.center_position[0])
             new_y = int(new_block_position[1] + self.center_position[1])
             if new_x < 0 or new_x >= board_width or new_y >= board_height or new_y < 0:
+                error
                 return False
             if board[new_y][new_x] != blank_color:
                 return False
