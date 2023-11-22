@@ -83,7 +83,6 @@ def tick():
     global game_over
     global held_this_turn
 
-
     if not game_over:
         if animation_timer == 360:
             animation_timer = 0
