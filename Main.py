@@ -3,12 +3,14 @@ import Tetris_Helper as tH
 
 board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
 camera = uvage.Camera(tH.scene_width, tH.scene_height)
-my_tetrimino = tH.SBlock()
+my_tetrimino = tH.generate_new_tetrimino()
 game_over = False
+held_this_turn = False
 fps = 30
 
 
 def get_input(m_t, f_a_e_i):
+    global held_this_turn
     if uvage.is_pressing("a"):
         if f_a_e_i["a"] == 0:
             m_t.move_x(board, "left")
@@ -49,15 +51,24 @@ def get_input(m_t, f_a_e_i):
             f_a_e_i["w"] += 1
     else:
         f_a_e_i["w"] = 0
-
-
-
+    if uvage.is_pressing("capslock") and not held_this_turn:
+        if f_a_e_i["capslock"] == 0:
+            held_this_turn = True
+            m_t = tH.swap_hold_tetrimino(my_tetrimino)
+            f_a_e_i["capslock"] += 1
+        elif f_a_e_i["capslock"] == 5:
+            f_a_e_i["capslock"] = 0
+        else:
+            f_a_e_i["capslock"] += 1
+    else:
+        f_a_e_i["capslock"] = 0
+    return m_t
 
 
 # ---- ANIMATION TIMERS ----
 animation_timer = 0
 frames_between_move_down = 10
-frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0}
+frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "capslock": 0}
 frames_to_move_on_ground = 25
 current_frames_on_ground = 0
 
@@ -70,12 +81,14 @@ def tick():
     global frames_to_move_on_ground
     global current_frames_on_ground
     global game_over
+    global held_this_turn
+
 
     if not game_over:
         if animation_timer == 360:
             animation_timer = 0
 
-        get_input(my_tetrimino, frames_after_each_input)
+        my_tetrimino = get_input(my_tetrimino, frames_after_each_input)
 
         if uvage.is_pressing("space"):
             if frames_after_each_input["space"] == 0:
@@ -84,6 +97,7 @@ def tick():
                 my_tetrimino.add_to_board(board)
                 tH.check_clear_lines(board)
                 my_tetrimino = tH.get_next_tetrimino()
+                held_this_turn = False
                 game_over = my_tetrimino.check_game_over(board)
                 frames_after_each_input["space"] += 1
             elif frames_after_each_input["space"] == 5:
@@ -97,6 +111,7 @@ def tick():
             if animation_timer % frames_between_move_down == 0:
                 if not my_tetrimino.move_down(board):
                     my_tetrimino = tH.get_next_tetrimino()
+                    held_this_turn = False
                     game_over = my_tetrimino.check_game_over(board)
                 animation_timer = 0
         else:
@@ -105,6 +120,7 @@ def tick():
             elif current_frames_on_ground == frames_to_move_on_ground:
                 if not my_tetrimino.move_down(board):
                     my_tetrimino = tH.get_next_tetrimino()
+                    held_this_turn = False
                     game_over = my_tetrimino.check_game_over(board)
                 current_frames_on_ground = 0
 

@@ -40,7 +40,6 @@ class Tetrimino:
         self.color = [0, 0, 0]
 
     def check_game_over(self, board):
-        print("ran game over")
         for i in self.block_positions:
             if board[int(i[1] + self.center_position[1])][int(i[0] + self.center_position[0])] != blank_color:
                 return True
@@ -136,6 +135,9 @@ class IBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [0, 255, 255]
+        self.set_defaults()
+
+    def set_defaults(self):
         self.center_position = [5.5, 0.5]
         self.block_positions = [[-1.5, 0.5], [-0.5, 0.5], [0.5, 0.5], [1.5, 0.5]]
 
@@ -145,6 +147,10 @@ class TBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [125, 0, 255]
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.center_position = [5, 1]
         self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, 0]]
 
         
@@ -153,7 +159,12 @@ class ZBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [255, 0, 0]
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.center_position = [5, 1]
         self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, -1]]
+
 
 
 class SBlock(Tetrimino):
@@ -161,6 +172,10 @@ class SBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [0, 255, 0]
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.center_position = [5, 1]
         self.block_positions = [[-1, -1], [0, -1], [0, 0], [1, 0]]
 
 
@@ -169,6 +184,10 @@ class LBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [255, 165, 0]
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.center_position = [5, 1]
         self.block_positions = [[-1, 0], [0, 0], [1, 0], [1, 1]]
 
 
@@ -177,7 +196,11 @@ class JBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [0, 0, 255]
-        self.block_positions = [[-1, -1], [-1, 0], [0, 0], [1, 0]]
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.center_position = [5, 1]
+        self.block_positions = [[-1, 1], [-1, 0], [0, 0], [1, 0]]
 
 
 class OBlock(Tetrimino):
@@ -185,7 +208,10 @@ class OBlock(Tetrimino):
     def __init__(self):
         super().__init__()
         self.color = [255, 255, 0]
-        self.center_position = [5.5, 1.5]
+        self.set_defaults()
+
+    def set_defaults(self):
+        self.center_position = [5.5, 0.5]
         self.block_positions = [[-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5], [0.5, 0.5]]
 
 
@@ -217,6 +243,24 @@ def get_next_tetrimino():
     return temp
 
 
+hold_tetrimino = None
+
+
+def swap_hold_tetrimino(my_tetrimino):
+    global hold_tetrimino
+    if hold_tetrimino is None:
+        my_tetrimino.set_defaults()
+        hold_tetrimino = my_tetrimino
+        my_tetrimino = get_next_tetrimino()
+        return my_tetrimino
+    else:
+        temp = hold_tetrimino
+        my_tetrimino.set_defaults()
+        hold_tetrimino = my_tetrimino
+        return temp
+
+
+
 def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
     for i in range(len(board)):
         y = board_top_left_position[1] + i * block_width + block_width / 2
@@ -242,6 +286,13 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
         y = board_top_left_position[1] + i[1] * block_width
         game_box = uvage.from_color(x, y, next_tetrimino.color, block_width, block_width)
         camera.draw(game_box)
+
+    if hold_tetrimino is not None:
+        for i in hold_tetrimino.get_block_positions():  # Draws the hold tetrimino to the right of the board
+            x = board_top_left_position[0] + board_width * block_width + i[0] * block_width + 50
+            y = board_top_left_position[1] + i[1] * block_width +  block_width * 4 + 100
+            game_box = uvage.from_color(x, y, hold_tetrimino.color, block_width, block_width)
+            camera.draw(game_box)
 
 
 def check_clear_lines(board):
