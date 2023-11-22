@@ -166,7 +166,6 @@ class ZBlock(Tetrimino):
         self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, -1]]
 
 
-
 class SBlock(Tetrimino):
 
     def __init__(self):
@@ -260,7 +259,6 @@ def swap_hold_tetrimino(my_tetrimino):
         return temp
 
 
-
 def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
     for i in range(len(board)):
         y = board_top_left_position[1] + i * block_width + block_width / 2
@@ -290,7 +288,7 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
     if hold_tetrimino is not None:
         for i in hold_tetrimino.get_block_positions():  # Draws the hold tetrimino to the right of the board
             x = board_top_left_position[0] + board_width * block_width + i[0] * block_width + 50
-            y = board_top_left_position[1] + i[1] * block_width +  block_width * 4 + 100
+            y = board_top_left_position[1] + i[1] * block_width + block_width * 4 + 100
             game_box = uvage.from_color(x, y, hold_tetrimino.color, block_width, block_width)
             camera.draw(game_box)
 
