@@ -78,6 +78,7 @@ def tick():
             my_tetrimino.center_position[0] = my_tetrimino.get_ghost(board).center_position[0]
             my_tetrimino.center_position[1] = my_tetrimino.get_ghost(board).center_position[1]
             my_tetrimino.add_to_board(board)
+            tH.check_clear_lines(board)
             my_tetrimino = tH.get_next_tetrimino()
             frames_after_each_input["space"] += 1
         elif frames_after_each_input["space"] == 5:

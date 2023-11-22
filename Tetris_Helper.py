@@ -53,7 +53,6 @@ class Tetrimino:
                 self.center_position[0] -= 1
                 new_x -= 1
             if new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
-                error
                 return False
         self.block_positions = new_block_positions
         return True
@@ -92,6 +91,8 @@ class Tetrimino:
             y = int(i[1] + self.center_position[1]) + 1
             if y >= board_height or board[y][x] != blank_color:
                 self.add_to_board(board)
+                print("ran")
+                check_clear_lines(board)
                 return False
         self.center_position[1] += 1
         return True
@@ -233,3 +234,18 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
         y = board_top_left_position[1] + i[1] * block_width
         game_box = uvage.from_color(x, y, next_tetrimino.color, block_width, block_width)
         camera.draw(game_box)
+
+
+def check_clear_lines(board):
+    for i in range(len(board)):
+        csf = True
+        for j in range(len(board[i])):
+            print(board[i][j])
+            if board[i][j] == blank_color:
+                csf = False
+                break
+        if csf:
+            print("ran2")
+            for j in range(len(board[i])):
+                for k in range(i, 1, -1):
+                    board[k][j] = board[k - 1][j]
