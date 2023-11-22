@@ -81,6 +81,24 @@ class Quad:
         return uvage.from_polygon(self.get_avg(0), self.get_avg(1), self.color, t_l[0], t_l[1], t_l[2], t_l[3]) #Fix X and Y
 
 
+def partition(array: list[Quad], low, high):
+    pivot = array[high].get_avg(2)
+    i = low - 1
+    for j in range(low, high):
+        if array[j].get_avg(2) <= pivot:
+            i += 1
+            (array[i], array[j]) = (array[j], array[i])
+    (array[i+1], array[high]) = (array[high], array[i+1])
+    return i + 1
+
+
+def quad_z_quicksort(array: list[Quad], low, high):
+    if low < high:
+        pi = partition(array, low, high)
+        quad_z_quicksort(array, low, pi - 1)
+        quad_z_quicksort(array, pi + 1, high)
+
+
 class Model:
     position = [0, 0, 0]
     rotation = [0, 0, 0]  # [pitch, yaw, roll]
@@ -115,10 +133,15 @@ class Model:
         # cam_pitch = camera.rotation[0]
         # cam_yaw = camera.rotation[1]
         # cam_roll = camera.rotation[2]
-        for i in self.quad_list:
-            copy_of_i = copy.deepcopy(i)
-            model_rotation_quad = copy_of_i.get_rotated_quad([0, 0, 0], pitch, yaw, roll)
-            current_game_box = model_rotation_quad.get_game_box()
+        copy_of_quad_list = copy.deepcopy(self.quad_list)
+        rotated_quad_list = []
+        for i in copy_of_quad_list:
+            model_rotation_quad = i.get_rotated_quad([0, 0, 0], pitch, yaw, roll)
+            rotated_quad_list.append(model_rotation_quad)
+        # Sort quads by z value
+        quad_z_quicksort(rotated_quad_list, 0, len(rotated_quad_list) - 1)
+        for i in rotated_quad_list:
+            current_game_box = i.get_game_box()
             current_game_box.x += self.position[0]
             current_game_box.y += self.position[1]
             game_box_list.append(current_game_box)
