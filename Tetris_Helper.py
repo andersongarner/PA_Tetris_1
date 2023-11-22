@@ -91,7 +91,6 @@ class Tetrimino:
             y = int(i[1] + self.center_position[1]) + 1
             if y >= board_height or board[y][x] != blank_color:
                 self.add_to_board(board)
-                print("ran")
                 check_clear_lines(board)
                 return False
         self.center_position[1] += 1
@@ -240,12 +239,10 @@ def check_clear_lines(board):
     for i in range(len(board)):
         csf = True
         for j in range(len(board[i])):
-            print(board[i][j])
             if board[i][j] == blank_color:
                 csf = False
                 break
         if csf:
-            print("ran2")
             for j in range(len(board[i])):
                 for k in range(i, 1, -1):
                     board[k][j] = board[k - 1][j]
