@@ -3,6 +3,7 @@ import copy
 import uvage
 import random as r
 
+
 board_width = 10
 board_height = 20
 scene_width = 1920

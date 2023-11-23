@@ -1,5 +1,6 @@
 import uvage
 import Tetris_Helper as tH
+import ThreeD_Helper as Tdh
 
 board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
 camera = uvage.Camera(tH.scene_width, tH.scene_height)
@@ -71,6 +72,9 @@ frames_between_move_down = 10
 frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "capslock": 0}
 frames_to_move_on_ground = 25
 current_frames_on_ground = 0
+my_cam = Tdh.Camera()
+
+current_shape = Tdh.Cube([500, 500, 500], 100)
 
 
 def tick():
@@ -82,6 +86,7 @@ def tick():
     global current_frames_on_ground
     global game_over
     global held_this_turn
+    global current_shape
 
     if not game_over:
         if animation_timer == 360:
@@ -125,6 +130,9 @@ def tick():
 
         camera.clear([0, 0, 0])
         tH.draw_board(board, my_tetrimino, camera)
+        current_shape.rotate_degrees(1, 1, 1)
+        for i in current_shape.get_game_box_list(my_cam):
+            camera.draw(i)
         camera.display()
         animation_timer += 1
 

@@ -2,14 +2,13 @@ import math
 import uvage
 import copy
 
-
 def rotate_point_around(point_0, point_1, pitch, yaw, roll):
-    cosa = math.cos(yaw)
-    sina = math.sin(yaw)
-    cosb = math.cos(pitch)
-    sinb = math.sin(pitch)
-    cosc = math.cos(roll)
-    sinc = math.sin(roll)
+    cosa = math.cos(-roll)
+    sina = math.sin(-roll)
+    cosb = math.cos(yaw)
+    sinb = math.sin(yaw)
+    cosc = math.cos(-pitch)
+    sinc = math.sin(-pitch)
     axx = cosa * cosb
     axy = cosa * sinb * sinc - sina * cosc
     axz = cosa * sinb * cosc + sina * sinc
@@ -143,64 +142,36 @@ class Model:
         return game_box_list
 
 
-cam = uvage.Camera(1920, 1080)
+class Cube(Model):
 
-cube = Model()
-cube.position = [500, 500, 500]
+    def __init__(self, position, width):
+        super().__init__()
+        self.position = position
+        top_left_back = [-width, width, -width]
+        bottom_left_back = [-width, -width, -width]
+        top_right_back = [width, width, -width]
+        bottom_right_back = [width, -width, -width]
+        top_left_front = [-width, width, width]
+        bottom_left_front = [-width, -width, width]
+        top_right_front = [width, width, width]
+        bottom_right_front = [width, -width, width]
 
-top_left_back = [-100, 100, -100]
-bottom_left_back = [-100, -100, -100]
-top_right_back = [100, 100, -100]
-bottom_right_back = [100, -100, -100]
-top_left_front = [-100, 100, 100]
-bottom_left_front = [-100, -100, 100]
-top_right_front = [100, 100, 100]
-bottom_right_front = [100, -100, 100]
-
-bottom_quad = Quad([bottom_right_front, bottom_right_back, bottom_left_back, bottom_left_front], [0, 0, 255])  # Blue
-top_quad = Quad([top_right_front, top_right_back, top_left_back, top_left_front], [0, 255, 255])  # Cyan
-left_quad = Quad([top_left_back, top_left_front, bottom_left_front, bottom_left_back], [255, 255, 0])  # Orange/Yellow
-right_quad = Quad([top_right_back, top_right_front, bottom_right_front, bottom_right_back], [0, 255, 0])  # Green
-back_quad = Quad([top_left_back, top_right_back, bottom_right_back, bottom_left_back], [255, 0, 255])  # Magenta
-front_quad = Quad([top_left_front, top_right_front, bottom_right_front, bottom_left_front], [255, 0, 0])  # Red
-
-cube.add_quad(bottom_quad)
-cube.add_quad(top_quad)
-cube.add_quad(left_quad)
-cube.add_quad(right_quad)
-cube.add_quad(back_quad)
-cube.add_quad(front_quad)
-
-my_cam = Camera()
-
-current_shape = cube
-
-
-def tick():
-    global current_shape
-    cam.clear("black")
-    if uvage.is_pressing("left arrow"):
-        current_shape.position[0] -= 5
-    if uvage.is_pressing("right arrow"):
-        current_shape.position[0] += 5
-    if uvage.is_pressing("up arrow"):
-        current_shape.position[1] -= 5
-    if uvage.is_pressing("down arrow"):
-        current_shape.position[1] += 5
-    if uvage.is_pressing("i"):
-        current_shape.rotate_degrees(1, 0, 0)
-    if uvage.is_pressing("j"):
-        current_shape.rotate_degrees(0, 0, 1)
-    if uvage.is_pressing("k"):
-        current_shape.rotate_degrees(-1, 0, 0)
-    if uvage.is_pressing("l"):
-        current_shape.rotate_degrees(0, 0, -1)
-    for i in current_shape.get_game_box_list(my_cam):
-        cam.draw(i)
-    #cube.rotate_degrees(1, 1, 1)
-    current_shape.draw_origin(cam)
-    cam.display()
+        bottom_quad = Quad([bottom_right_front, bottom_right_back, bottom_left_back, bottom_left_front],
+                               [0, 0, 255])  # Blue
+        top_quad = Quad([top_right_front, top_right_back, top_left_back, top_left_front], [0, 255, 255])  # Cyan
+        left_quad = Quad([top_left_back, top_left_front, bottom_left_front, bottom_left_back],
+                             [255, 255, 0])  # Orange/Yellow
+        right_quad = Quad([top_right_back, top_right_front, bottom_right_front, bottom_right_back],
+                              [0, 255, 0])  # Green
+        back_quad = Quad([top_left_back, top_right_back, bottom_right_back, bottom_left_back],
+                             [255, 0, 255])  # Magenta
+        front_quad = Quad([top_left_front, top_right_front, bottom_right_front, bottom_left_front],
+                              [255, 0, 0])  # Red
+        self.add_quad(bottom_quad)
+        self.add_quad(top_quad)
+        self.add_quad(left_quad)
+        self.add_quad(right_quad)
+        self.add_quad(back_quad)
+        self.add_quad(front_quad)
 
 
-
-uvage.timer_loop(60, tick)
