@@ -52,17 +52,17 @@ def get_input(m_t, f_a_e_i):
             f_a_e_i["w"] += 1
     else:
         f_a_e_i["w"] = 0
-    if uvage.is_pressing("capslock") and not held_this_turn:
-        if f_a_e_i["capslock"] == 0:
+    if uvage.is_pressing("tab") and not held_this_turn:
+        if f_a_e_i["tab"] == 0:
             held_this_turn = True
             m_t = tH.swap_hold_tetrimino(my_tetrimino)
-            f_a_e_i["capslock"] += 1
-        elif f_a_e_i["capslock"] == 5:
-            f_a_e_i["capslock"] = 0
+            f_a_e_i["tab"] += 1
+        elif f_a_e_i["tab"] == 5:
+            f_a_e_i["tab"] = 0
         else:
-            f_a_e_i["capslock"] += 1
+            f_a_e_i["tab"] += 1
     else:
-        f_a_e_i["capslock"] = 0
+        f_a_e_i["tab"] = 0
     return m_t
 
 

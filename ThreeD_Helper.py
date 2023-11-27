@@ -1,4 +1,6 @@
 import math
+
+import Tetris_Helper
 import uvage
 import copy
 
@@ -175,3 +177,16 @@ class Cube(Model):
         self.add_quad(front_quad)
 
 
+def get_three_d_board(board: list[list[list[int]]]):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            # get bottom
+            # get left side
+            # get top
+            # get right side
+            # get front
+            pass
+
+
+def get_three_d_tetrimino(my_tetrimino: Tetris_Helper.Tetrimino):
+    pass

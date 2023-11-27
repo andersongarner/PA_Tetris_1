@@ -10,7 +10,7 @@ scene_width = 1920
 scene_height = 1080
 board_top_left_position = [100, 100]
 blank_color = [255, 255, 255]
-block_width = 20
+block_width = 40
 
 
 def rotate_point_around(point0, point1, direction="clockwise"):  # Rotate point0 around point1
