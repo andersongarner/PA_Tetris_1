@@ -1,3 +1,29 @@
+# +------------------------------------------------------ TETRIS ------------------------------------------------------+
+# |                                By William Mason hvv9dc and Anderson Garner zyf5jh                                  |
+# |                                                                                                                    |
+# | We are gonna make a tetris game / CHECKPOINT 2: WE ARE MAKING A TETRIS GAME                                        |
+# |                                                                                                                    |
+# | We will use user input with the arrow keys to move the falling blocks                                              |
+# |                                                                / CHECKPOINT 2: CHANGED TO WASD CONTROL SCHEME      |
+# |                                                                                                        IMPLEMENTED |
+# |         W - Rotate block clockwise                                                                                 |
+# |         A - Move block left                                                                                        |
+# |         S - Soft drop                                                                                              |
+# |         D - Move block right                                                                                       |
+# |       Tab - Hold block                                                                                             |
+# |     Space - Hard drop                                                                                              |
+# |                                                                                                                    |
+# | Game over is when the blocks go above the screen / CHECKPOINT 2: CHANGED TO WHEN BLOCKS CANNOT BE ADDED TO SCREEN  |
+# |                                                                                                       IMPLEMENTED  |
+# | Our project will use graphics to display the tetris logo / CHECKPOINT 2: NOT IMPLEMENTED YET                       |
+# | We will also use object-oriented programming to organize our code / CHECKPOINT 2: SEE TETRIS HELPER, FULL OF OOP   |
+# |                                                                                                       IMPLEMENTED  |
+# | We will do restart from game over / CHECKPOINT 2: NOT IMPLEMENTED YET                                              |
+# | we will use a timer to count how long you play / CHECKPOINT 2: NOT IMPLEMENTED YET                                 |
+# | we will also use a file to save highscores so no matter how many times you open it, your score will be saved!      |
+# |                                                                          / CHECKPOINT 2: NOT IMPLEMENTED YET       |
+# +--------------------------------------------------------------------------------------------------------------------+
+
 import uvage
 import Tetris_Helper as tH
 import ThreeD_Helper as Tdh
@@ -69,7 +95,7 @@ def get_input(m_t, f_a_e_i):
 # ---- ANIMATION TIMERS ----
 animation_timer = 0
 frames_between_move_down = 10
-frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "capslock": 0}
+frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "tab": 0}
 frames_to_move_on_ground = 25
 current_frames_on_ground = 0
 my_cam = Tdh.Camera()
@@ -113,7 +139,9 @@ def tick():
 
         if not my_tetrimino.center_position[1] == my_tetrimino.get_ghost(board).center_position[1]:
             if animation_timer % frames_between_move_down == 0:
-                if not my_tetrimino.move_down(board):
+                number_of_lines_cleared = my_tetrimino.move_down(board)
+                if number_of_lines_cleared != -1:
+                    # implement score change based on number of lines cleared
                     my_tetrimino = tH.get_next_tetrimino()
                     held_this_turn = False
                     game_over = my_tetrimino.check_game_over(board)
@@ -132,7 +160,8 @@ def tick():
         tH.draw_board(board, my_tetrimino, camera)
         current_shape.rotate_degrees(1, 1, 1)
         for i in current_shape.get_game_box_list(my_cam):
-            camera.draw(i)
+            pass
+            #camera.draw(i)
         camera.display()
         animation_timer += 1
 

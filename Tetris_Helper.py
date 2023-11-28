@@ -100,10 +100,10 @@ class Tetrimino:
             y = int(i[1] + self.center_position[1]) + 1
             if y >= board_height or board[y][x] != blank_color:
                 self.add_to_board(board)
-                check_clear_lines(board)
-                return False
+                number_of_lines_cleared = check_clear_lines(board)
+                return number_of_lines_cleared
         self.center_position[1] += 1
-        return True
+        return -1  # Returns -1 if move_down successfully moved tetrimino down
 
     def add_to_board(self, board):
         for i in self.block_positions:
@@ -295,6 +295,7 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
 
 
 def check_clear_lines(board):
+    number_of_lines_cleared = 0
     for i in range(len(board)):
         csf = True
         for j in range(len(board[i])):
@@ -302,6 +303,8 @@ def check_clear_lines(board):
                 csf = False
                 break
         if csf:
+            number_of_lines_cleared += 1
             for j in range(len(board[i])):
                 for k in range(i, 1, -1):
                     board[k][j] = board[k - 1][j]
+    return number_of_lines_cleared
