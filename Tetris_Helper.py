@@ -10,7 +10,7 @@ board_extra_space = 2
 scene_width = 1920
 scene_height = 1080
 board_top_left_position = [100, 100]
-blank_color = [255, 255, 255]
+blank_color = [10, 10, 10]
 block_width = 40
 
 
