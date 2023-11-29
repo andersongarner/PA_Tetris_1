@@ -6,12 +6,12 @@
 # | We will use user input with the arrow keys to move the falling blocks                                              |
 # |                                                                / CHECKPOINT 2: CHANGED TO WASD CONTROL SCHEME      |
 # |                                                                                                        IMPLEMENTED |
-# |         W - Rotate block clockwise                                                                                 |
-# |         A - Move block left                                                                                        |
-# |         S - Soft drop                                                                                              |
-# |         D - Move block right                                                                                       |
-# |       Tab - Hold block                                                                                             |
-# |     Space - Hard drop                                                                                              |
+# |           W - Rotate block clockwise                                                                               |
+# |           A - Move block left                                                                                      |
+# |           S - Soft drop                                                                                            |
+# |           D - Move block right                                                                                     |
+# |  Left Shift - Hold block                                                                                           |
+# |       Space - Hard drop                                                                                            |
 # |                                                                                                                    |
 # | Game over is when the blocks go above the screen / CHECKPOINT 2: CHANGED TO WHEN BLOCKS CANNOT BE ADDED TO SCREEN  |
 # |                                                                                                       IMPLEMENTED  |
@@ -33,12 +33,18 @@ camera = uvage.Camera(tH.scene_width, tH.scene_height)
 my_tetrimino = tH.generate_new_tetrimino()
 game_over = False
 held_this_turn = False
+t_spin_flag = False
+mini_t_spin_flag = False
 fps = 30
 
 
 def get_input(m_t, f_a_e_i):
     global held_this_turn
+    global t_spin_flag
+    global mini_t_spin_flag
     if uvage.is_pressing("a"):
+        t_spin_flag = False
+        mini_t_spin_flag = False
         if f_a_e_i["a"] == 0:
             m_t.move_x(board, "left")
             f_a_e_i["a"] += 1
@@ -49,6 +55,8 @@ def get_input(m_t, f_a_e_i):
     else:
         f_a_e_i["a"] = 0
     if uvage.is_pressing("d"):
+        t_spin_flag = False
+        mini_t_spin_flag = False
         if f_a_e_i["d"] == 0:
             m_t.move_x(board, "right")
             f_a_e_i["d"] += 1
@@ -59,6 +67,8 @@ def get_input(m_t, f_a_e_i):
     else:
         f_a_e_i["d"] = 0
     if uvage.is_pressing("s") and m_t.center_position[1] != m_t.get_ghost(board).center_position[1]:
+        t_spin_flag = False
+        mini_t_spin_flag = False
         if f_a_e_i["s"] == 0:
             m_t.move_down(board)
             f_a_e_i["s"] += 1
@@ -70,7 +80,9 @@ def get_input(m_t, f_a_e_i):
         f_a_e_i["s"] = 0
     if uvage.is_pressing("w"):
         if f_a_e_i["w"] == 0:
-            m_t.rotate(board, "clockwise")
+            l_my = m_t.rotate(board, "clockwise")  # returns list [rotation successful, t-spin-flag, mini-t-spin-flag]
+            t_spin_flag = l_my[1]
+            mini_t_spin_flag = l_my[2]
             f_a_e_i["w"] += 1
         elif f_a_e_i["w"] == 5:
             f_a_e_i["w"] = 0
@@ -78,29 +90,31 @@ def get_input(m_t, f_a_e_i):
             f_a_e_i["w"] += 1
     else:
         f_a_e_i["w"] = 0
-    if uvage.is_pressing("tab") and not held_this_turn:
-        if f_a_e_i["tab"] == 0:
+    if uvage.is_pressing("left shift") and not held_this_turn:
+        t_spin_flag = False
+        mini_t_spin_flag = False
+        if f_a_e_i["left shift"] == 0:
             held_this_turn = True
             m_t = tH.swap_hold_tetrimino(my_tetrimino)
-            f_a_e_i["tab"] += 1
-        elif f_a_e_i["tab"] == 5:
-            f_a_e_i["tab"] = 0
+            f_a_e_i["left shift"] += 1
+        elif f_a_e_i["left shift"] == 5:
+            f_a_e_i["left shift"] = 0
         else:
-            f_a_e_i["tab"] += 1
+            f_a_e_i["left shift"] += 1
     else:
-        f_a_e_i["tab"] = 0
+        f_a_e_i["left shift"] = 0
     return m_t
 
 
 # ---- ANIMATION TIMERS ----
 animation_timer = 0
 frames_between_move_down = 10
-frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "tab": 0}
+frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
 frames_to_move_on_ground = 25
 current_frames_on_ground = 0
 my_cam = Tdh.Camera()
 
-current_shape = Tdh.Cube([500, 500, 500], 100)
+current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
 
 
 def tick():
@@ -113,10 +127,13 @@ def tick():
     global game_over
     global held_this_turn
     global current_shape
+    global t_spin_flag
 
     if not game_over:
         if animation_timer == 360:
             animation_timer = 0
+
+        t_spin_flag = False
 
         my_tetrimino = get_input(my_tetrimino, frames_after_each_input)
 
@@ -160,8 +177,7 @@ def tick():
         tH.draw_board(board, my_tetrimino, camera)
         current_shape.rotate_degrees(1, 1, 1)
         for i in current_shape.get_game_box_list(my_cam):
-            pass
-            #camera.draw(i)
+            camera.draw(i)
         camera.display()
         animation_timer += 1
 

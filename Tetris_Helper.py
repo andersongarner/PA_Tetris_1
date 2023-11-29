@@ -34,6 +34,7 @@ class Tetrimino:
     center_position = [2, 1]
     block_positions = []
     color = [0, 0, 0]
+    current_rotation = 0  # 0, 1=R, 2, 3=L
 
     def __init__(self):
         self.center_position = [5, 1]
@@ -48,7 +49,10 @@ class Tetrimino:
                 return True
         return False
 
-    def rotate(self, board, direction="clockwise"):
+    def check_t_spin(self, board):
+        return [False, False]
+
+    def rotate(self, board, direction="clockwise"):  # Returns [Rotation Successful, t-spin, mini t-spin]
         new_block_positions = []
         for i in range(len(self.block_positions)):
             new_block_position = rotate_point_around(self.block_positions[i], [0, 0], direction)
@@ -62,9 +66,13 @@ class Tetrimino:
                 self.center_position[0] -= 1
                 new_x -= 1
             if new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
-                return False
+                return [False, False, False]
         self.block_positions = new_block_positions
-        return True
+        self.current_rotation += 1
+        if self.current_rotation == 4:
+            self.current_rotation = 0
+        my_list = self.check_t_spin(board)
+        return [True, my_list[0], my_list[1]]
 
     def move_x(self, board, direction=""):
         move_val = 0
@@ -149,6 +157,55 @@ class TBlock(Tetrimino):
         super().__init__()
         self.color = [125, 0, 255]
         self.set_defaults()
+
+    def check_t_spin(self, board):  # returns [t-spin, mini t-spin]
+        # check mini t-spin
+        # check true t-spin
+        t_spin = False
+        mini_t_spin = False
+        number_in_front = 0
+        number_behind = 0
+        if self.current_rotation == 0:
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_in_front += 1
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_in_front += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_behind += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_behind += 1
+        elif self.current_rotation == 1:
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_behind += 1
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_in_front += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_behind += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_in_front += 1
+        elif self.current_rotation == 2:
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_behind += 1
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_behind += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_in_front += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_in_front += 1
+        elif self.current_rotation == 3:
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_in_front += 1
+            if board[int(self.center_position[1] - 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_behind += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] - 1)] != blank_color:
+                number_in_front += 1
+            if board[int(self.center_position[1] + 1)][int(self.center_position[0] + 1)] != blank_color:
+                number_behind += 1
+        if number_in_front == 2 and number_behind == 1:
+            t_spin = True
+        elif number_behind == 2 and number_in_front == 1:
+            mini_t_spin = True
+        return [t_spin, mini_t_spin]
 
     def set_defaults(self):
         self.center_position = [5, 1]
