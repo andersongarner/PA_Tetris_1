@@ -37,6 +37,48 @@ t_spin_flag = False
 mini_t_spin_flag = False
 fps = 30
 
+# ---- DEFINE ANIMATION TIMERS ----
+animation_timer = 0
+frames_between_move_down = 10
+frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
+frames_to_move_on_ground = 25
+current_frames_on_ground = 0
+
+current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
+
+
+def reset_game():
+    global my_tetrimino
+    global animation_timer
+    global frames_between_move_down
+    global frames_after_each_input
+    global frames_to_move_on_ground
+    global current_frames_on_ground
+    global game_over
+    global held_this_turn
+    global current_shape
+    global t_spin_flag
+    global mini_t_spin_flag
+    global board
+    global my_tetrimino
+
+    board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
+    my_tetrimino = tH.generate_new_tetrimino()
+
+    # ---- ANIMATION TIMERS ----
+    animation_timer = 0
+    frames_between_move_down = 10
+    frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
+    frames_to_move_on_ground = 25
+    current_frames_on_ground = 0
+
+    current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
+
+    game_over = False
+    held_this_turn = False
+    t_spin_flag = False
+    mini_t_spin_flag = False
+
 
 def get_input(m_t, f_a_e_i):
     global held_this_turn
@@ -106,15 +148,9 @@ def get_input(m_t, f_a_e_i):
     return m_t
 
 
-# ---- ANIMATION TIMERS ----
-animation_timer = 0
-frames_between_move_down = 10
-frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
-frames_to_move_on_ground = 25
-current_frames_on_ground = 0
 my_cam = Tdh.Camera()
 
-current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
+reset_game()
 
 
 def tick():
@@ -180,6 +216,8 @@ def tick():
             camera.draw(i)
         camera.display()
         animation_timer += 1
+    else:
+        reset_game()
 
 
 uvage.timer_loop(fps, tick)
