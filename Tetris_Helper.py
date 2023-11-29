@@ -58,6 +58,7 @@ class Tetrimino:
         new_block_positions = []
         new_y = 0
         new_x = 0
+        issues = False
         for i in self.offset[self.current_rotation]:
             for j in range(len(self.block_positions)):
                 new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
@@ -70,9 +71,12 @@ class Tetrimino:
                 while new_x >= board_width:
                     self.center_position[0] -= 1
                     new_x -= 1
-            if not (new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color):
+                if new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color:
+                    issues = True
+                    continue
+            if not issues:
                 break
-        if new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color:
+        if issues:
             return [False, False, False]
         self.block_positions = new_block_positions
         self.current_rotation += 1
