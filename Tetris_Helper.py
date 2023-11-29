@@ -5,7 +5,8 @@ import random as r
 
 
 board_width = 10
-board_height = 20
+board_height = 22
+board_extra_space = 2
 scene_width = 1920
 scene_height = 1080
 board_top_left_position = [100, 100]
@@ -31,15 +32,16 @@ def rotate_point_around(point0, point1, direction="clockwise"):  # Rotate point0
 
 
 class Tetrimino:
-    center_position = [2, 1]
+    center_position = [5, 2]
     block_positions = []
     color = [0, 0, 0]
     current_rotation = 0  # 0, 1=R, 2, 3=L
+    offset = [[]]
 
     def __init__(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, 2]
         self.block_positions = []
-        self.color = [0, 0, 0]
+        self.offset = [[]]
 
     def check_game_over(self, board):
         for i in self.block_positions:
@@ -65,7 +67,7 @@ class Tetrimino:
             while new_x >= board_width:
                 self.center_position[0] -= 1
                 new_x -= 1
-            if new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
+            if new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color:
                 return [False, False, False]
         self.block_positions = new_block_positions
         self.current_rotation += 1
@@ -147,8 +149,13 @@ class IBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5.5, 0.5]
-        self.block_positions = [[-1.5, 0.5], [-0.5, 0.5], [0.5, 0.5], [1.5, 0.5]]
+        self.center_position = [5, 1]
+        self.block_positions = [[-1, 0], [0, 0], [1, 0], [2, 0]]
+        o_offsets = [[0, 0], [-1, 0], [2, 0], [-1, 0], [2, 0]]
+        r_offsets = [[-1, 0], [0, 0], [0, 1], [0, -2]]
+        two_offsets = [[-1, 1], [1, 1], [-2, 1], [1, 0], [-2, 0]]
+        l_offsets = [[0, 1], [0, 1], [0, -1], [0, 2]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
     
 class TBlock(Tetrimino):
@@ -210,6 +217,11 @@ class TBlock(Tetrimino):
     def set_defaults(self):
         self.center_position = [5, 1]
         self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, 0]]
+        o_offsets = [[0, 0]]
+        r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
+        two_offsets = [[0, 0]]
+        l_offsets = [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
         
 class ZBlock(Tetrimino):
@@ -221,7 +233,12 @@ class ZBlock(Tetrimino):
 
     def set_defaults(self):
         self.center_position = [5, 1]
-        self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, -1]]
+        self.block_positions = [[-1, -1], [0, -1], [0, 0], [1, 0]]
+        o_offsets = [[0, 0]]
+        r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
+        two_offsets = [[0, 0]]
+        l_offsets = [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
 
 class SBlock(Tetrimino):
@@ -233,7 +250,12 @@ class SBlock(Tetrimino):
 
     def set_defaults(self):
         self.center_position = [5, 1]
-        self.block_positions = [[-1, -1], [0, -1], [0, 0], [1, 0]]
+        self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, -1]]
+        o_offsets = [[0, 0]]
+        r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
+        two_offsets = [[0, 0]]
+        l_offsets = [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
 
 class LBlock(Tetrimino):
@@ -245,7 +267,12 @@ class LBlock(Tetrimino):
 
     def set_defaults(self):
         self.center_position = [5, 1]
-        self.block_positions = [[-1, 0], [0, 0], [1, 0], [1, 1]]
+        self.block_positions = [[-1, 0], [0, 0], [1, 0], [1, -1]]
+        o_offsets = [[0, 0]]
+        r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
+        two_offsets = [[0, 0]]
+        l_offsets = [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
 
 class JBlock(Tetrimino):
@@ -257,7 +284,12 @@ class JBlock(Tetrimino):
 
     def set_defaults(self):
         self.center_position = [5, 1]
-        self.block_positions = [[-1, 1], [-1, 0], [0, 0], [1, 0]]
+        self.block_positions = [[-1, -1], [-1, 0], [0, 0], [1, 0]]
+        o_offsets = [[0, 0]]
+        r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
+        two_offsets = [[0, 0]]
+        l_offsets = [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
 
 class OBlock(Tetrimino):
@@ -268,8 +300,13 @@ class OBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5.5, 0.5]
-        self.block_positions = [[-0.5, -0.5], [-0.5, 0.5], [0.5, -0.5], [0.5, 0.5]]
+        self.center_position = [5, 1]
+        self.block_positions = [[0, 0], [0, -1], [1, 0], [1, -1]]
+        o_offsets = [[0, 0]]
+        r_offsets = [[0, -1]]
+        two_offsets = [[-1, -1]]
+        l_offsets = [[-1, 0]]
+        self.offset = [o_offsets, r_offsets, two_offsets, l_offsets]
 
 
 def generate_new_tetrimino():
@@ -318,23 +355,25 @@ def swap_hold_tetrimino(my_tetrimino):
 
 
 def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
-    for i in range(len(board)):
+    for i in range(board_height - board_extra_space):
         y = board_top_left_position[1] + i * block_width + block_width / 2
-        for j in range(len(board[i])):
+        for j in range(len(board[i - board_extra_space])):
             x = board_top_left_position[0] + j * block_width + block_width / 2
-            game_box = uvage.from_color(x, y, board[i][j], block_width, block_width)
+            game_box = uvage.from_color(x, y, board[i + board_extra_space][j], block_width, block_width)
             camera.draw(game_box)
 
     for i in current_tetrimino.get_ghost(board).get_block_positions():  # Draw ghost
         x = board_top_left_position[0] + (i[0] + + 0.5) * block_width
-        y = board_top_left_position[1] + (i[1] + 0.5) * block_width
-        game_box = uvage.from_color(x, y, current_tetrimino.get_ghost(board).color, block_width, block_width)
+        y = board_top_left_position[1] + (i[1] + 0.5 - board_extra_space) * block_width
+        if y > board_top_left_position[1]:
+            game_box = uvage.from_color(x, y, current_tetrimino.get_ghost(board).color, block_width, block_width)
         camera.draw(game_box)
 
     for i in current_tetrimino.get_block_positions():  # Draws the current tetrimino on top of the board
-        x = board_top_left_position[0] + (i[0] + + 0.5) * block_width
-        y = board_top_left_position[1] + (i[1] + 0.5) * block_width
-        game_box = uvage.from_color(x, y, current_tetrimino.color, block_width, block_width)
+        x = board_top_left_position[0] + (i[0] + 0.5) * block_width
+        y = board_top_left_position[1] + (i[1] + 0.5 - board_extra_space) * block_width
+        if y > board_top_left_position[1]:
+            game_box = uvage.from_color(x, y, current_tetrimino.color, block_width, block_width)
         camera.draw(game_box)
 
     for i in next_tetrimino.get_block_positions():  # Draws the next tetrimino to the right of the board

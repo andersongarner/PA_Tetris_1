@@ -62,7 +62,7 @@ def reset_game():
     global board
     global my_tetrimino
 
-    board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
+    board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height + tH.board_extra_space)]
     my_tetrimino = tH.generate_new_tetrimino()
 
     # ---- ANIMATION TIMERS ----
