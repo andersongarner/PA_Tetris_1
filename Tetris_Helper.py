@@ -56,19 +56,24 @@ class Tetrimino:
 
     def rotate(self, board, direction="clockwise"):  # Returns [Rotation Successful, t-spin, mini t-spin]
         new_block_positions = []
-        for i in range(len(self.block_positions)):
-            new_block_position = rotate_point_around(self.block_positions[i], [0, 0], direction)
-            new_block_positions.append(new_block_position)
-            new_x = int(new_block_position[0] + self.center_position[0])
-            new_y = int(new_block_position[1] + self.center_position[1])
-            while new_x < 0:
-                self.center_position[0] += 1
-                new_x += 1
-            while new_x >= board_width:
-                self.center_position[0] -= 1
-                new_x -= 1
-            if new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color:
-                return [False, False, False]
+        new_y = 0
+        new_x = 0
+        for i in self.offset[self.current_rotation]:
+            for j in range(len(self.block_positions)):
+                new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
+                new_block_positions.append(new_block_position)
+                new_x = int(new_block_position[0] + self.center_position[0] + i[0])
+                new_y = int(new_block_position[1] + self.center_position[1] + i[1])
+                while new_x < 0:
+                    self.center_position[0] += 1
+                    new_x += 1
+                while new_x >= board_width:
+                    self.center_position[0] -= 1
+                    new_x -= 1
+            if not (new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color):
+                break
+        if new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color:
+            return [False, False, False]
         self.block_positions = new_block_positions
         self.current_rotation += 1
         if self.current_rotation == 4:

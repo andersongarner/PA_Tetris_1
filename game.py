@@ -6,19 +6,20 @@
 # | We will use user input with the arrow keys to move the falling blocks                                              |
 # |                                                                / CHECKPOINT 2: CHANGED TO WASD CONTROL SCHEME      |
 # |                                                                                                        IMPLEMENTED |
-# |           W - Rotate block clockwise                                                                               |
-# |           A - Move block left                                                                                      |
-# |           S - Soft drop                                                                                            |
-# |           D - Move block right                                                                                     |
-# |  Left Shift - Hold block                                                                                           |
-# |       Space - Hard drop                                                                                            |
+# |                    W - Rotate block clockwise                                                                      |
+# |                    A - Move block left                                                                             |
+# |                    S - Soft drop                                                                                   |
+# |                    D - Move block right                                                                            |
+# |           Left Shift - Hold block                                                                                  |
+# |                Space - Hard drop                                                                                   |
+# |                    R - Reset Game (When game is over)
 # |                                                                                                                    |
 # | Game over is when the blocks go above the screen / CHECKPOINT 2: CHANGED TO WHEN BLOCKS CANNOT BE ADDED TO SCREEN  |
 # |                                                                                                       IMPLEMENTED  |
 # | Our project will use graphics to display the tetris logo / CHECKPOINT 2: NOT IMPLEMENTED YET                       |
 # | We will also use object-oriented programming to organize our code / CHECKPOINT 2: SEE TETRIS HELPER, FULL OF OOP   |
 # |                                                                                                       IMPLEMENTED  |
-# | We will do restart from game over / CHECKPOINT 2: NOT IMPLEMENTED YET                                              |
+# | We will do restart from game over / CHECKPOINT 2: NOT IMPLEMENTED YET / IMPLEMENTED 11/29/23                       |
 # | we will use a timer to count how long you play / CHECKPOINT 2: NOT IMPLEMENTED YET                                 |
 # | we will also use a file to save highscores so no matter how many times you open it, your score will be saved!      |
 # |                                                                          / CHECKPOINT 2: NOT IMPLEMENTED YET       |
@@ -217,7 +218,8 @@ def tick():
         camera.display()
         animation_timer += 1
     else:
-        reset_game()
+        if uvage.is_pressing("r"):
+            reset_game()
 
 
 uvage.timer_loop(fps, tick)
