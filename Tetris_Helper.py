@@ -139,7 +139,8 @@ class Tetrimino:
                     loop = 100
                     continue
         ghost = Tetrimino()
-        ghost.color = [self.color[0] / 2, self.color[1] / 2, self.color[2] / 2]
+        new_color = [(self.color[0] + 3 * blank_color[0]) / 4, (self.color[1] + 3 * blank_color[1]) / 4, (self.color[2] + 3 * blank_color[2]) / 4]
+        ghost.color = new_color
         ghost.block_positions = copy.deepcopy(self.block_positions)
         ghost.center_position[0] = self.center_position[0]
         ghost.center_position[1] = current_y - 1
