@@ -5,8 +5,8 @@ import random as r
 
 
 board_width = 10
-board_height = 22
-board_extra_space = 2
+board_height = 25
+board_extra_space = 5
 scene_width = 1920
 scene_height = 1080
 board_top_left_position = [100, 100]
@@ -175,7 +175,7 @@ class IBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[-1, 0], [0, 0], [1, 0], [2, 0]]
         o_offsets = [[0, 0], [-1, 0], [2, 0], [-1, 0], [2, 0]]
         r_offsets = [[-1, 0], [0, 0], [0, 0], [0, 1], [0, -2]]
@@ -241,7 +241,7 @@ class TBlock(Tetrimino):
         return [t_spin, mini_t_spin]
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, 0]]
         o_offsets = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
@@ -258,7 +258,7 @@ class ZBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[-1, -1], [0, -1], [0, 0], [1, 0]]
         o_offsets = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
@@ -292,7 +292,7 @@ class LBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[-1, 0], [0, 0], [1, 0], [1, -1]]
         o_offsets = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
@@ -309,7 +309,7 @@ class JBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[-1, -1], [-1, 0], [0, 0], [1, 0]]
         o_offsets = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
@@ -326,7 +326,7 @@ class OBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[0, 0], [0, -1], [1, 0], [1, -1]]
         o_offsets = [[0, 0]]
         r_offsets = [[0, -1]]

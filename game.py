@@ -37,6 +37,7 @@ held_this_turn = False
 t_spin_flag = False
 mini_t_spin_flag = False
 fps = 30
+timer = 0.0
 
 # ---- DEFINE ANIMATION TIMERS ----
 animation_timer = 0
@@ -62,6 +63,7 @@ def reset_game():
     global mini_t_spin_flag
     global board
     global my_tetrimino
+    global timer
 
     board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height + tH.board_extra_space)]
     my_tetrimino = tH.generate_new_tetrimino()
@@ -79,6 +81,8 @@ def reset_game():
     held_this_turn = False
     t_spin_flag = False
     mini_t_spin_flag = False
+
+    timer = 0.0
 
 
 def get_input(m_t, f_a_e_i):
@@ -165,8 +169,11 @@ def tick():
     global held_this_turn
     global current_shape
     global t_spin_flag
+    global timer
 
     if not game_over:
+        timer += 1 / fps
+
         if animation_timer == 360:
             animation_timer = 0
 
@@ -211,6 +218,8 @@ def tick():
                 current_frames_on_ground = 0
 
         camera.clear([0, 0, 0])
+        t_g_b = uvage.from_text(1000, 100, str("{:.2f}".format(timer)), 30, "white")
+        camera.draw(t_g_b)
         tH.draw_board(board, my_tetrimino, camera)
         current_shape.rotate_degrees(1, 1, 1)
         for i in current_shape.get_game_box_list(my_cam):
