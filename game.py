@@ -68,7 +68,7 @@ def reset_game():
 
     # ---- ANIMATION TIMERS ----
     animation_timer = 0
-    frames_between_move_down = 10
+    frames_between_move_down = 1000
     frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
     frames_to_move_on_ground = 25
     current_frames_on_ground = 0
