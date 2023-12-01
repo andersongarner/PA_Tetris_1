@@ -39,7 +39,7 @@ class Tetrimino:
     offset = [[]]
 
     def __init__(self):
-        self.center_position = [5, 2]
+        self.center_position = copy.deepcopy([5, 2])
         self.block_positions = []
         self.offset = [[]]
 
@@ -136,6 +136,7 @@ class Tetrimino:
             if y >= board_height or board[y][x] != blank_color:
                 self.add_to_board(board)
                 number_of_lines_cleared = check_clear_lines(board)
+                print("inside: ", number_of_lines_cleared)
                 return number_of_lines_cleared
         self.center_position[1] += 1
         return -1  # Returns -1 if move_down successfully moved tetrimino down
@@ -176,7 +177,7 @@ class IBlock(Tetrimino):
 
     def set_defaults(self):
         self.center_position = [5, board_extra_space - 1]
-        self.block_positions = [[-1, 0], [0, 0], [1, 0], [2, 0]]
+        self.block_positions = copy.deepcopy([[-1, 0], [0, 0], [1, 0], [2, 0]])
         o_offsets = [[0, 0], [-1, 0], [2, 0], [-1, 0], [2, 0]]
         r_offsets = [[-1, 0], [0, 0], [0, 0], [0, 1], [0, -2]]
         two_offsets = [[-1, 1], [1, 1], [-2, 1], [1, 0], [-2, 0]]

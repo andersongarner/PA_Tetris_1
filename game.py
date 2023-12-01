@@ -117,7 +117,10 @@ def get_input(m_t, f_a_e_i):
         t_spin_flag = False
         mini_t_spin_flag = False
         if f_a_e_i["s"] == 0:
-            m_t.move_down(board)
+            x = m_t.move_down(board)
+            print("outside:", x)
+            if x != -1:
+                m_t = tH.get_next_tetrimino()
             f_a_e_i["s"] += 1
         elif f_a_e_i["s"] == 2:
             f_a_e_i["s"] = 0
@@ -211,10 +214,10 @@ def tick():
             if current_frames_on_ground < frames_to_move_on_ground:
                 current_frames_on_ground += 1
             elif current_frames_on_ground == frames_to_move_on_ground:
-                if not my_tetrimino.move_down(board):
-                    my_tetrimino = tH.get_next_tetrimino()
-                    held_this_turn = False
-                    game_over = my_tetrimino.check_game_over(board)
+                my_tetrimino.move_down(board)
+                my_tetrimino = tH.get_next_tetrimino()
+                held_this_turn = False
+                game_over = my_tetrimino.check_game_over(board)
                 current_frames_on_ground = 0
 
         camera.clear([0, 0, 0])
