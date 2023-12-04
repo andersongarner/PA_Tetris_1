@@ -1,4 +1,5 @@
 import copy
+import math
 
 import ThreeD_Helper
 import uvage
@@ -426,21 +427,21 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
 
 
 def draw_next(camera, uvage_camera: uvage.Camera):
-    x = uvage.from_text(camera.position[0] - 325, camera.position[1] - 250, "NEXT", 40, [127, 127, 127])
+    x = uvage.from_text(camera.position[0] - 325 + 600, camera.position[1] - 250, "NEXT", 40, [127, 127, 127])
     uvage_camera.draw(x)
     for i in next_tetrimino.get_block_positions():  # Draws the next tetrimino to the right of the board
-        x = i[0] * block_width + camera.position[0] - 550
+        x = i[0] * block_width + camera.position[0] - 550 + 600
         y = i[1] * block_width + camera.position[1] - 300
         game_box = uvage.from_color(x, y, next_tetrimino.color, block_width, block_width)
         uvage_camera.draw(game_box)
 
 
 def draw_hold(camera, uvage_camera: uvage.Camera):
-    x = uvage.from_text(camera.position[0] - 325, camera.position[1] - 75, "HOLD", 40, [127, 127, 127])
+    x = uvage.from_text(camera.position[0] - 325 + 600, camera.position[1] - 75, "HOLD", 40, [127, 127, 127])
     uvage_camera.draw(x)
     if hold_tetrimino is not None:
         for i in hold_tetrimino.get_block_positions():  # Draws the hold tetrimino to the right of the board
-            x = i[0] * block_width + camera.position[0] - 550
+            x = i[0] * block_width + camera.position[0] - 550 + 600
             y = i[1] * block_width + camera.position[1] - 125
             game_box = uvage.from_color(x, y, hold_tetrimino.color, block_width, block_width)
             uvage_camera.draw(game_box)
@@ -460,3 +461,7 @@ def check_clear_lines(board):
                 for k in range(i, 1, -1):
                     board[k][j] = board[k - 1][j]
     return number_of_lines_cleared
+
+
+def get_radians(degrees):
+    return degrees * math.pi / 180

@@ -29,6 +29,7 @@
 # |                                                                          / CHECKPOINT 2: NOT IMPLEMENTED YET       |
 # +--------------------------------------------------------------------------------------------------------------------+
 import math
+import threading
 
 import ThreeD_Helper
 import uvage
@@ -271,10 +272,8 @@ for i in range(25):
     new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
     title_screen_tetrimino_model_list.append(new_model)
 
-wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.png")
-
-direction = 1
-current_add = 0
+wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.jpg")
+title_screen = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.png")
 
 def tick():
     global my_tetrimino
@@ -305,7 +304,7 @@ def tick():
 
     if game_on is False:
         camera.clear([0, 0, 0])
-        camera.draw(wallpaper)
+        camera.draw(title_screen)
         for i in title_screen_tetrimino_model_list:
             i.rotate_degrees(1, 1, 1)
             for j in i.get_game_box_list(my_cam):
@@ -318,11 +317,15 @@ def tick():
         camera.display()
         if uvage.is_pressing("return"):
             my_cam.rotation = [0, 0, 0]
-            my_cam.position = [tH.scene_width / 2 + 600, tH.scene_height / 2, 0]
+            my_cam.position = [tH.scene_width / 2, tH.scene_height / 2, 0]
             game_on = True
+            for i in range(0, 255 * 2, 1):
+                camera.clear([i // 6, i // 6, i // 2])
+                x = uvage.from_color(tH.scene_width / 2 - 50, tH.scene_height / 2, [i // 2, i // 2, i // 2], tH.block_width * tH.board_width, tH.block_width * (tH.board_height - tH.board_extra_space))
+                camera.draw(x)
+                camera.display()
 
     if not game_over and game_on:
-
 
         if frames_between_move_down <= 0:
             frames_between_move_down = 1
@@ -417,11 +420,11 @@ def tick():
         camera.clear([0, 0, 0])
         camera.draw(wallpaper)
         for i in my_board_model:
-            i.position = [tH.board_top_left_position[0] + tH.block_width / 2, tH.board_top_left_position[1] - 9/2 * tH.block_width, 0]
+            i.position = [tH.board_top_left_position[0] + tH.block_width / 2 + 600, tH.board_top_left_position[1] - 9/2 * tH.block_width, 0]
 
         my_cam = get_camera_input(my_cam)
 
-        text_x_val = my_cam.position[0] - 325
+        text_x_val = my_cam.position[0] - 325 + 600
         text_y_val = my_cam.position[1] - 400
 
         t_g_b = uvage.from_text(text_x_val, text_y_val, str("Timer: {:.2f}".format(timer)), 30, [127, 127, 127])
@@ -431,7 +434,7 @@ def tick():
         level_game_box = uvage.from_text(text_x_val, text_y_val + 90, "Level: " + str(level), 30, [127, 127, 127])
 
 
-        left = tH.board_top_left_position[0]
+        left = tH.board_top_left_position[0] + 600
         right = left + tH.board_width * tH.block_width
         top = tH.board_top_left_position[1]
         bottom = top + (tH.board_height - tH.board_extra_space) * tH.block_width
@@ -445,7 +448,7 @@ def tick():
         for i in background_model.get_game_box_list(my_cam):
             camera.draw(i)
 
-        model_x = my_tetrimino.center_position[0] * tH.block_width + tH.board_top_left_position[0] + tH.block_width / 2
+        model_x = my_tetrimino.center_position[0] * tH.block_width + tH.board_top_left_position[0] + tH.block_width / 2 + 600
         model_y = my_tetrimino.center_position[1] * tH.block_width + tH.board_top_left_position[
             1] - tH.board_extra_space * tH.block_width + tH.block_width / 2
         for i in current_tetrimino_model:
@@ -453,7 +456,7 @@ def tick():
 
         ghost_tetrimino = my_tetrimino.get_ghost(board)
         model_x = ghost_tetrimino.center_position[0] * tH.block_width + tH.board_top_left_position[
-            0] + tH.block_width / 2
+            0] + tH.block_width / 2 + 600
         model_y = ghost_tetrimino.center_position[1] * tH.block_width + tH.board_top_left_position[
             1] - tH.board_extra_space * tH.block_width + tH.block_width / 2
         ghost_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(ghost_tetrimino)
@@ -502,7 +505,7 @@ def tick():
         tH.draw_hold(my_cam, camera)
 
         if b2b:
-            camera.draw(uvage.from_text(my_cam.position[0] - 300, my_cam.position[1] + 300, "Back-To-Back Bonus Active!", 30, fancy_color))
+            camera.draw(uvage.from_text(my_cam.position[0] + 300, my_cam.position[1] + 300, "Back-To-Back Bonus Active!", 30, fancy_color))
 
         camera.display()
         animation_timer += 1
