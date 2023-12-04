@@ -1,5 +1,6 @@
 import copy
 
+import ThreeD_Helper
 import uvage
 import random as r
 
@@ -58,8 +59,8 @@ class Tetrimino:
         new_block_positions = []
         new_center_position = copy.deepcopy(self.center_position)
         issues = False
-        c_r = copy.deepcopy(self.current_rotation)
-        if c_r + 1 == 4:
+        c_r = self.current_rotation
+        if c_r + 1 >= 4:
             c_r = 0
         else:
             c_r += 1
@@ -68,13 +69,10 @@ class Tetrimino:
             x = self.offset[self.current_rotation][i][0] - self.offset[c_r][i][0]
             y = self.offset[self.current_rotation][i][1] - self.offset[c_r][i][1]
             kick_translations.append([x, y])
-        print("\nkick translations:", kick_translations)
         for i in kick_translations:
             issues = False
-            print("i:", i)
-            print("center_position before:", self.center_position)
             new_center_position[0] = self.center_position[0] + i[0]
-            new_center_position[1] = self.center_position[1] - i[1]
+            new_center_position[1] = self.center_position[1] + i[1]
             for j in range(len(self.block_positions)):
                 new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
                 new_block_positions.append(new_block_position)
@@ -87,12 +85,11 @@ class Tetrimino:
                     new_center_position[0] -= 1
                     new_x -= 1
                 # ("new_center:", new_center_position)
-                if new_x < 0 or new_x > board_width or new_y >= board_height - board_extra_space or new_y < 0 or board[new_y][new_x] != blank_color:
+                if new_x < 0 or new_x > board_width or new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
                     issues = True
                     break
             if not issues:
                 break
-        print("new center position:", self.center_position)
         if issues:
             return [False, False, False]
         self.center_position = new_center_position
@@ -136,7 +133,6 @@ class Tetrimino:
             if y >= board_height or board[y][x] != blank_color:
                 self.add_to_board(board)
                 number_of_lines_cleared = check_clear_lines(board)
-                print("inside: ", number_of_lines_cleared)
                 return number_of_lines_cleared
         self.center_position[1] += 1
         return -1  # Returns -1 if move_down successfully moved tetrimino down
@@ -146,6 +142,14 @@ class Tetrimino:
             x = int(i[0] + self.center_position[0])
             y = int(i[1] + self.center_position[1])
             board[y][x] = self.color
+
+    def get_copy(self):
+        my_copy = Tetrimino()
+        my_copy.block_positions = copy.deepcopy(self.block_positions)
+        my_copy.color = copy.deepcopy(self.color)
+        my_copy.center_position[0] = self.center_position[0]
+        my_copy.center_position[1] = self.center_position[1]
+        return my_copy
 
     def get_ghost(self, board):
         current_y = self.center_position[1]
@@ -199,6 +203,10 @@ class TBlock(Tetrimino):
         mini_t_spin = False
         number_in_front = 0
         number_behind = 0
+        if self.center_position[1] - 1 < 0 or self.center_position[0] - 1 < 0:
+            return [False, False]
+        if self.center_position[1] + 1 >= board_height or self.center_position[0] + 1 >= board_width:
+            return [False, False]
         if self.current_rotation == 0:
             if board[int(self.center_position[1] - 1)][int(self.center_position[0] - 1)] != blank_color:
                 number_in_front += 1
@@ -276,7 +284,7 @@ class SBlock(Tetrimino):
         self.set_defaults()
 
     def set_defaults(self):
-        self.center_position = [5, 1]
+        self.center_position = [5, board_extra_space - 1]
         self.block_positions = [[-1, 0], [0, 0], [0, -1], [1, -1]]
         o_offsets = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
         r_offsets = [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]]
@@ -415,6 +423,27 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
             y = board_top_left_position[1] + i[1] * block_width + block_width * 4 + 100
             game_box = uvage.from_color(x, y, hold_tetrimino.color, block_width, block_width)
             camera.draw(game_box)
+
+
+def draw_next(camera, uvage_camera: uvage.Camera):
+    x = uvage.from_text(camera.position[0] - 325, camera.position[1] - 250, "NEXT", 40, [127, 127, 127])
+    uvage_camera.draw(x)
+    for i in next_tetrimino.get_block_positions():  # Draws the next tetrimino to the right of the board
+        x = i[0] * block_width + camera.position[0] - 550
+        y = i[1] * block_width + camera.position[1] - 300
+        game_box = uvage.from_color(x, y, next_tetrimino.color, block_width, block_width)
+        uvage_camera.draw(game_box)
+
+
+def draw_hold(camera, uvage_camera: uvage.Camera):
+    x = uvage.from_text(camera.position[0] - 325, camera.position[1] - 75, "HOLD", 40, [127, 127, 127])
+    uvage_camera.draw(x)
+    if hold_tetrimino is not None:
+        for i in hold_tetrimino.get_block_positions():  # Draws the hold tetrimino to the right of the board
+            x = i[0] * block_width + camera.position[0] - 550
+            y = i[1] * block_width + camera.position[1] - 125
+            game_box = uvage.from_color(x, y, hold_tetrimino.color, block_width, block_width)
+            uvage_camera.draw(game_box)
 
 
 def check_clear_lines(board):

@@ -1,6 +1,6 @@
 import math
 
-import Tetris_Helper
+import Tetris_Helper as tH
 import uvage
 import copy
 
@@ -82,7 +82,7 @@ def partition(array: list[Quad], low, high):
     pivot = array[high].get_avg(2)
     i = low - 1
     for j in range(low, high):
-        if array[j].get_avg(2) >= pivot:
+        if array[j].get_avg(2) <= pivot:
             i += 1
             (array[i], array[j]) = (array[j], array[i])
     (array[i+1], array[high]) = (array[high], array[i+1])
@@ -127,20 +127,25 @@ class Model:
         pitch = self.rotation[0]
         yaw = self.rotation[1]
         roll = self.rotation[2]
-        # cam_pitch = camera.rotation[0]
-        # cam_yaw = camera.rotation[1]
-        # cam_roll = camera.rotation[2]
+        cam_pitch = camera.rotation[0]
+        cam_yaw = camera.rotation[1]
+        cam_roll = camera.rotation[2]
         copy_of_quad_list = copy.deepcopy(self.quad_list)
         rotated_quad_list = []
         for i in copy_of_quad_list:
             model_rotation_quad = i.get_rotated_quad([0, 0, 0], pitch, yaw, roll)
+            model_rotation_quad.move_all_points([self.position[0], self.position[1], self.position[2]])
             rotated_quad_list.append(model_rotation_quad)
-        # Sort quads by z value
-        quad_z_quicksort(rotated_quad_list, 0, len(rotated_quad_list) - 1)
+        camera_rotated_quad_list = []
         for i in rotated_quad_list:
+            camera_rotated_quad = i.get_rotated_quad(camera.position, cam_pitch, cam_yaw, cam_roll)
+            camera_rotated_quad_list.append(camera_rotated_quad)
+        # Sort quads by z value
+        quad_z_quicksort(rotated_quad_list, 0, len(camera_rotated_quad_list) - 1)
+        for i in camera_rotated_quad_list:
             current_game_box = i.get_game_box()
-            current_game_box.x += self.position[0]
-            current_game_box.y += self.position[1]
+            current_game_box.x += camera.position[0] - tH.scene_width / 2
+            current_game_box.y += camera.position[1] - tH.scene_height / 2
             game_box_list.append(current_game_box)
         return game_box_list
 
@@ -179,15 +184,116 @@ class Cube(Model):
 
 
 def get_three_d_board(board: list[list[list[int]]]):
+    front_model = Model()
+    top_model = Model()
+    right_model = Model()
+    bottom_model = Model()
+    left_model = Model()
+    back_model = Model()
     for i in range(len(board)):
         for j in range(len(board[i])):
-            # get bottom
-            # get left side
-            # get top
-            # get right side
+            if board[i][j] == tH.blank_color:
+                continue
+            f_top_left_corner = [j * tH.block_width - tH.block_width / 2, i * tH.block_width - tH.block_width / 2, tH.block_width / 2]
+            f_top_right_corner = [j * tH.block_width + tH.block_width / 2, i * tH.block_width - tH.block_width / 2, tH.block_width / 2]
+            f_bottom_right_corner = [j * tH.block_width + tH.block_width / 2, i * tH.block_width + tH.block_width / 2, tH.block_width / 2]
+            f_bottom_left_corner = [j * tH.block_width - tH.block_width / 2, i * tH.block_width + tH.block_width / 2, tH.block_width / 2]
+            b_top_left_corner = [j * tH.block_width - tH.block_width / 2, i * tH.block_width - tH.block_width / 2, -tH.block_width / 2]
+            b_top_right_corner = [j * tH.block_width + tH.block_width / 2, i * tH.block_width - tH.block_width / 2, -tH.block_width / 2]
+            b_bottom_right_corner = [j * tH.block_width + tH.block_width / 2, i * tH.block_width + tH.block_width / 2, -tH.block_width / 2]
+            b_bottom_left_corner = [j * tH.block_width - tH.block_width / 2, i * tH.block_width + tH.block_width / 2, -tH.block_width / 2]
+
             # get front
-            pass
+
+            # get top
+            if i - 1 < 0 or board[i - 1][j] == tH.blank_color:
+                top_point_list = [b_top_left_corner, b_top_right_corner, f_top_right_corner, f_top_left_corner]
+                top_color = [(board[i][j][0] + 255) // 2, (board[i][j][1] + 255) // 2,
+                             (board[i][j][2] + 255) // 2]
+                top_quad = Quad(top_point_list, top_color)
+                top_model.add_quad(top_quad)
 
 
-def get_three_d_tetrimino(my_tetrimino: Tetris_Helper.Tetrimino):
-    pass
+            # get bottom
+            if i + 1 >= tH.board_height or board[i + 1][j] == tH.blank_color:
+                bottom_point_list = [b_bottom_left_corner, b_bottom_right_corner, f_bottom_right_corner, f_bottom_left_corner]
+                bottom_color = [board[i][j][0] // 2, board[i][j][1] // 2, board[i][j][2] // 2]
+                bottom_quad = Quad(bottom_point_list, bottom_color)
+                bottom_model.add_quad(bottom_quad)
+
+            # get left side
+            if j - 1 < 0 or board[i][j - 1] == tH.blank_color:
+                left_point_list = [b_bottom_left_corner, b_top_left_corner, f_top_left_corner, f_bottom_left_corner]
+                left_color = [(board[i][j][0] * 2) // 3, (board[i][j][1] * 2) // 3, (board[i][j][2] * 2) // 3]
+                left_quad = Quad(left_point_list, left_color)
+                left_model.add_quad(left_quad)
+            # get right side
+            if j + 1 >= tH.board_width or board[i][j + 1] == tH.blank_color:
+                right_point_list = [b_bottom_right_corner, b_top_right_corner, f_top_right_corner, f_bottom_right_corner]
+                right_color = [(board[i][j][0] * 2) // 3, (board[i][j][1] * 2) // 3, (board[i][j][2] * 2) // 3]
+                right_quad = Quad(right_point_list, right_color)
+                right_model.add_quad(right_quad)
+            front_point_list = [f_top_left_corner, f_top_right_corner, f_bottom_right_corner, f_bottom_left_corner]
+            front_quad = Quad(front_point_list, board[i][j])
+            front_model.add_quad(front_quad)
+            back_point_list = [b_top_left_corner, b_top_right_corner, b_bottom_right_corner, b_bottom_left_corner]
+            back_quad = Quad(back_point_list, board[i][j])
+            back_model.add_quad(back_quad)
+    return [front_model, top_model, right_model, bottom_model, left_model, back_model]
+
+
+def get_three_d_tetrimino(my_tetrimino: tH.Tetrimino):
+    front_model = Model()
+    top_model = Model()
+    right_model = Model()
+    bottom_model = Model()
+    left_model = Model()
+    back_model = Model()
+    for i in my_tetrimino.block_positions:
+        f_top_left_corner = [i[0] * tH.block_width - tH.block_width / 2, i[1] * tH.block_width - tH.block_width / 2, tH.block_width / 2]
+        f_top_right_corner = [i[0] * tH.block_width + tH.block_width / 2, i[1] * tH.block_width - tH.block_width / 2, tH.block_width / 2]
+        f_bottom_right_corner = [i[0] * tH.block_width + tH.block_width / 2, i[1] * tH.block_width + tH.block_width / 2, tH.block_width / 2]
+        f_bottom_left_corner = [i[0] * tH.block_width - tH.block_width / 2, i[1] * tH.block_width + tH.block_width / 2, tH.block_width / 2]
+        b_top_left_corner = [i[0] * tH.block_width - tH.block_width / 2, i[1] * tH.block_width - tH.block_width / 2, -tH.block_width / 2]
+        b_top_right_corner = [i[0] * tH.block_width + tH.block_width / 2, i[1] * tH.block_width - tH.block_width / 2, -tH.block_width / 2]
+        b_bottom_right_corner = [i[0] * tH.block_width + tH.block_width / 2, i[1] * tH.block_width + tH.block_width / 2, -tH.block_width / 2]
+        b_bottom_left_corner = [i[0] * tH.block_width - tH.block_width / 2, i[1] * tH.block_width + tH.block_width / 2, -tH.block_width / 2]
+        front_point_list = [f_top_left_corner, f_top_right_corner, f_bottom_right_corner, f_bottom_left_corner]
+        front_quad = Quad(front_point_list, my_tetrimino.color)
+        front_model.add_quad(front_quad)
+        back_point_list = [b_top_left_corner, b_top_right_corner, b_bottom_right_corner, b_bottom_left_corner]
+        back_quad = Quad(back_point_list, my_tetrimino.color)
+        back_model.add_quad(back_quad)
+        # [above = false, right = false, below = false, left = false]
+        my_list = [False, False, False, False]
+        for j in my_tetrimino.block_positions:
+            if j[0] - i[0] == 0 and j[1] - i[1] == -1:
+                my_list[0] = True
+            elif j[0] - i[0] == 1 and j[1] - i[1] == 0:
+                my_list[1] = True
+            elif j[0] - i[0] == 0 and j[1] - i[1] == 1:
+                my_list[2] = True
+            elif j[0] - i[0] == -1 and j[1] - i[1] == 0:
+                my_list[3] = True
+        if not my_list[0]:  # no tetrimino above
+            top_point_list = [b_top_left_corner, b_top_right_corner, f_top_right_corner, f_top_left_corner]
+            top_color = [(my_tetrimino.color[0] + 255) // 2, (my_tetrimino.color[1] + 255) // 2, (my_tetrimino.color[2] + 255) // 2]
+            top_quad = Quad(top_point_list, top_color)
+            top_model.add_quad(top_quad)
+        if not my_list[1]:  # no tetrimino right
+            right_point_list = [b_top_right_corner, f_top_right_corner, f_bottom_right_corner, b_bottom_right_corner]
+            right_color = [(2 * my_tetrimino.color[0]) // 3, (2 * my_tetrimino.color[1]) // 3, (2 * my_tetrimino.color[2]) // 3]
+            right_quad = Quad(right_point_list, right_color)
+            right_model.add_quad(right_quad)
+        if not my_list[2]:  # no tetrimino bottom
+            bottom_point_list = [b_bottom_left_corner, b_bottom_right_corner, f_bottom_right_corner, f_bottom_left_corner]
+            bottom_color = [(my_tetrimino.color[0]) // 2, (my_tetrimino.color[1]) // 2, (my_tetrimino.color[2]) // 2]
+            bottom_quad = Quad(bottom_point_list, bottom_color)
+            bottom_model.add_quad(bottom_quad)
+        if not my_list[3]:  # no tetrimino left
+            left_point_list = [b_bottom_left_corner, b_top_left_corner, f_top_left_corner, f_bottom_left_corner]
+            left_color = [(2 * my_tetrimino.color[0]) // 3, (2 * my_tetrimino.color[1]) // 3, (2 * my_tetrimino.color[2]) // 3]
+            left_quad = Quad(left_point_list, left_color)
+            left_model.add_quad(left_quad)
+
+    return [front_model, top_model, right_model, bottom_model, left_model, back_model]
