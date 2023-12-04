@@ -69,6 +69,8 @@ current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_po
 camera_animator = 0
 direction = 1
 
+high_score = tH.get_high_score()
+
 
 def reset_game():
     global my_tetrimino
@@ -326,6 +328,7 @@ def tick():
     global camera_animator
     global direction
     global camera_add
+    global high_score
 
     if game_on is False:
         camera.clear([0, 0, 0])
