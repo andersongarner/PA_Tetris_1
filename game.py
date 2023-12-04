@@ -20,7 +20,7 @@
 # |                                                                                                                    |
 # | Game over is when the blocks go above the screen / CHECKPOINT 2: CHANGED TO WHEN BLOCKS CANNOT BE ADDED TO SCREEN  |
 # |                                                                                                       IMPLEMENTED  |
-# | Our project will use graphics to display the tetris logo / CHECKPOINT 2: NOT IMPLEMENTED YET                       |
+# | Our project will use graphics to display the tetris logo / CHECKPOINT 2: NOT IMPLEMENTED YET / 12/3/23 IMPLEMENTED |
 # | We will also use object-oriented programming to organize our code / CHECKPOINT 2: SEE TETRIS HELPER, FULL OF OOP   |
 # |                                                                                                       IMPLEMENTED  |
 # | We will do restart from game over / CHECKPOINT 2: NOT IMPLEMENTED YET / IMPLEMENTED 11/29/23                       |
@@ -35,6 +35,7 @@ import uvage
 import Tetris_Helper as tH
 import ThreeD_Helper as Tdh
 import Score
+import random as r
 
 
 board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
@@ -53,7 +54,6 @@ milestone = 10
 b2b = False
 combo = 0
 number_of_lines_cleared = 0
-t_spin_this_turn = False
 
 # ---- DEFINE ANIMATION TIMERS ----
 animation_timer = 0
@@ -87,14 +87,13 @@ def reset_game():
     global b2b
     global combo
     global number_of_lines_cleared
-    global t_spin_this_turn
 
     board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height + tH.board_extra_space)]
     my_tetrimino = tH.generate_new_tetrimino()
 
     # ---- ANIMATION TIMERS ----
     animation_timer = 0
-    frames_between_move_down = 100
+    frames_between_move_down = 101
     frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
     frames_to_move_on_ground = 35
     current_frames_on_ground = 0
@@ -105,7 +104,6 @@ def reset_game():
     held_this_turn = False
     t_spin_flag = False
     mini_t_spin_flag = False
-    t_spin_this_turn = False
 
     timer = 0.0
     total_lines_cleared = 0
@@ -134,7 +132,6 @@ def get_input(m_t, f_a_e_i):
     global b2b
     global combo
     global number_of_lines_cleared
-    global t_spin_this_turn
 
     if uvage.is_pressing("a"):
         t_spin_flag = False
@@ -177,9 +174,7 @@ def get_input(m_t, f_a_e_i):
                 b2b = y[2]
                 mini_t_spin_flag = False
                 t_spin_flag = False
-                b2b = False
                 m_t = tH.get_next_tetrimino()
-                t_spin_this_turn = False
                 current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino)
                 my_board_model = ThreeD_Helper.get_three_d_board(board)
             elif x == 0:
@@ -201,8 +196,6 @@ def get_input(m_t, f_a_e_i):
                     i.rotate_degrees(0, 0, -90)
                 t_spin_flag = l_my[1]
                 mini_t_spin_flag = l_my[2]
-                if t_spin_flag or mini_t_spin_flag:
-                    t_spin_this_turn = True
             f_a_e_i["w"] += 1
         elif f_a_e_i["w"] == 5:
             f_a_e_i["w"] = 0
@@ -214,7 +207,6 @@ def get_input(m_t, f_a_e_i):
         t_spin_flag = False
         mini_t_spin_flag = False
         if f_a_e_i["left shift"] == 0:
-            t_spin_this_turn = False
             held_this_turn = True
             m_t = tH.swap_hold_tetrimino(my_tetrimino)
             current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(m_t)
@@ -230,13 +222,17 @@ def get_input(m_t, f_a_e_i):
 
 def get_camera_input(my_camera: ThreeD_Helper.Camera):
     if uvage.is_pressing("left arrow"):
-        my_camera.position[0] -= 5
+        if my_camera.position[0] >= 700:
+            my_camera.position[0] -= 5
     if uvage.is_pressing("up arrow"):
-        my_camera.position[1] -= 5
+        if my_camera.position[1] > 0:
+            my_camera.position[1] -= 5
     if uvage.is_pressing("right arrow"):
-        my_camera.position[0] += 5
+        if my_camera.position[0] < tH.scene_width:
+            my_camera.position[0] += 5
     if uvage.is_pressing("down arrow"):
-        my_camera.position[1] += 5
+        if my_camera.position[1] < tH.scene_height:
+            my_camera.position[1] += 5
     if uvage.is_pressing("i"):
         if my_camera.rotation[0] < math.pi / 6:
             my_camera.rotate_degrees(2, 0, 0)
@@ -261,11 +257,21 @@ current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino.get_c
 my_board_model = ThreeD_Helper.get_three_d_board(board)
 
 
-my_cam.position = [tH.scene_width - tH.scene_width / 6, tH.scene_height / 2, 0]
+my_cam.position = [tH.scene_width / 2, tH.scene_height / 2, 0]
 
 fancy_color = [0, 127, 255]
 
 game_on = False
+
+image = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "tetris-logo.png")
+title_screen_tetrimino_model_list = []
+for i in range(25):
+    new_model = ThreeD_Helper.get_whole_three_d_tetrimino(tH.generate_new_tetrimino())
+    new_model.position = [r.randint(my_cam.position[0] - 1000, my_cam.position[0] + 1000), r.randint(my_cam.position[1] - 500, my_cam.position[1] + 500), r.randint(-1000, 1000)]
+    new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
+    title_screen_tetrimino_model_list.append(new_model)
+
+wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.jpg")
 
 def tick():
     global my_tetrimino
@@ -291,17 +297,30 @@ def tick():
     global b2b
     global fancy_color
     global number_of_lines_cleared
-    global t_spin_this_turn
     global game_on
+    global title_screen_tetrimino_model_list
 
     if game_on is False:
-        text = uvage.from_text(tH.scene_width / 2, tH.scene_height / 2, "Press Enter to Start...", 60, [255, 255, 255])
+        camera.clear([0, 0, 0])
+        camera.draw(wallpaper)
+        for i in title_screen_tetrimino_model_list:
+            i.rotate_degrees(1, 1, 1)
+            for j in i.get_game_box_list(my_cam):
+                camera.draw(j)
+        my_cam.rotate_degrees(0.25, 0.25, 0.25)
+
+        text = uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 + 400, "Press Enter to Start...", 60, [255, 255, 255])
         camera.draw(text)
+        camera.draw(image)
         camera.display()
         if uvage.is_pressing("return"):
+            my_cam.rotation = [0, 0, 0]
+            my_cam.position = [tH.scene_width / 2 + 600, tH.scene_height / 2, 0]
             game_on = True
 
     if not game_over and game_on:
+        if frames_between_move_down <= 0:
+            frames_between_move_down = 1
         fancy_color[0] += 5
         fancy_color[1] += 10
         fancy_color[2] += 15
@@ -324,7 +343,6 @@ def tick():
         if uvage.is_pressing("space"):
             if frames_after_each_input["space"] == 0:
                 score += int(2 * (my_tetrimino.get_ghost(board).center_position[1] - my_tetrimino.center_position[1]))
-                t_spin_this_turn = False
                 my_tetrimino.center_position[0] = my_tetrimino.get_ghost(board).center_position[0]
                 my_tetrimino.center_position[1] = my_tetrimino.get_ghost(board).center_position[1]
                 my_tetrimino.add_to_board(board)
@@ -338,7 +356,6 @@ def tick():
                 b2b = y[2]
                 mini_t_spin_flag = False
                 t_spin_flag = False
-                b2b = False
                 total_lines_cleared += number_of_lines_cleared
                 my_tetrimino = tH.get_next_tetrimino()
                 current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino)
@@ -357,7 +374,6 @@ def tick():
             if animation_timer % frames_between_move_down == 0:
                 number_of_lines_cleared = my_tetrimino.move_down(board)
                 if number_of_lines_cleared != -1:
-                    t_spin_this_turn = False
                     if number_of_lines_cleared == 0:
                         combo = 0
                     y = Score.get_guideline_scoring(number_of_lines_cleared, level, b2b, combo, t_spin_flag,
@@ -367,7 +383,6 @@ def tick():
                     b2b = y[2]
                     mini_t_spin_flag = False
                     t_spin_flag = False
-                    b2b = False
                     # implement score change based on number of lines cleared
                     my_tetrimino = tH.get_next_tetrimino()
                     held_this_turn = False
@@ -387,8 +402,6 @@ def tick():
                 b2b = y[2]
                 mini_t_spin_flag = False
                 t_spin_flag = False
-                b2b = False
-                t_spin_this_turn = False
                 my_tetrimino = tH.get_next_tetrimino()
                 current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino)
                 my_board_model = ThreeD_Helper.get_three_d_board(board)
@@ -397,6 +410,7 @@ def tick():
                 current_frames_on_ground = 0
 
         camera.clear([0, 0, 0])
+        camera.draw(wallpaper)
         for i in my_board_model:
             i.position = [tH.board_top_left_position[0] + tH.block_width / 2, tH.board_top_left_position[1] - 9/2 * tH.block_width, 0]
 
@@ -483,12 +497,10 @@ def tick():
         tH.draw_hold(my_cam, camera)
 
         if b2b:
-            camera.draw(uvage.from_text(my_cam.position[0] - 300, my_cam.position[1] + 200, "Back-To-Back Bonus Active!", 30, fancy_color))
+            camera.draw(uvage.from_text(my_cam.position[0] - 300, my_cam.position[1] + 300, "Back-To-Back Bonus Active!", 30, fancy_color))
 
         camera.display()
         animation_timer += 1
-        print("mini:", mini_t_spin_flag, "t:", t_spin_flag)
-
 
         if total_lines_cleared >= milestone:
             milestone += 10
@@ -496,6 +508,8 @@ def tick():
             frames_between_move_down -= 10
 
     elif game_on:
+        camera.draw(uvage.from_text(1000, 600, "PRESS R TO RESTART...", 60, [127, 127, 127]))
+        camera.display()
         if uvage.is_pressing("r"):
             reset_game()
 
