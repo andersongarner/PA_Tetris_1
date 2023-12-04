@@ -568,18 +568,18 @@ def tick():
         tH.draw_hold(my_cam, camera)
 
         if b2b:
-            camera.draw(uvage.from_text(my_cam.position[0] + 300, my_cam.position[1] + 300, "Back-To-Back Bonus Active!", 30, fancy_color))
+            camera.draw(uvage.from_text(my_cam.position[0] + 200, my_cam.position[1] + 200, "Back-To-Back Bonus Active!", 30, fancy_color))
 
         camera.display()
         animation_timer += 1
 
-        #increases level every ten lines
+        # increases level every ten lines
         if total_lines_cleared >= milestone:
             milestone += 10
             level += 1
             frames_between_move_down -= 10
 
-    #if game is over
+    # if game is over
     elif game_on:
         if tH.compare_score(score, high_score):
             high_score = score
