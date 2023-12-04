@@ -349,7 +349,7 @@ def tick():
             game_on = True
             camera_add = [0, 0]
             for i in range(0, 255 * 2, 1):
-                camera.clear([i // 15, i // 15, i // 5])
+                camera.clear([i // 20, i // 20, i // 8])
                 x = uvage.from_color(tH.scene_width / 2 - 50, tH.scene_height / 2, [i // 2, i // 2, i // 2], tH.block_width * tH.board_width, tH.block_width * (tH.board_height - tH.board_extra_space))
                 camera.draw(x)
                 camera.display()
@@ -541,6 +541,7 @@ def tick():
         camera.draw(t_g_b)
         camera.draw(score_game_box)
         camera.draw(level_game_box)
+        camera.draw(high_score_box)
 
         tH.draw_next(my_cam, camera)
         tH.draw_hold(my_cam, camera)
@@ -559,11 +560,10 @@ def tick():
     elif game_on:
         if tH.compare_score(score, high_score):
             high_score = score
-            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100,"NEW HIGH SCORE! " + str(score), 60, [127,127, 127]))
+            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100, "NEW HIGH SCORE! " + str(score), 60, [127,127, 127]))
         else:
-            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100, "YOUR SCORE: " + str(score), 60, [127, 127, 127]))
-
-        camera.draw(uvage.from_text(1000, 600, "PRESS R TO RESTART...", 60, [127, 127, 127]))
+            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2, "YOUR SCORE: " + str(score), 60, [127, 127, 127]))
+        camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 + 100, "PRESS R TO RESTART...", 60, [127, 127, 127]))
         camera.display()
         if uvage.is_pressing("r"):
             reset_game()
