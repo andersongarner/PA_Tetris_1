@@ -297,8 +297,8 @@ for i in range(30):
     new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
     title_screen_tetrimino_model_list.append(new_model)
 
-wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.jpg")
-title_screen = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.png")
+wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper_small.jpg")
+title_screen = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper_small.png")
 camera_add = [0, 0]
 
 t_g_b = None
