@@ -339,6 +339,7 @@ def tick():
     global score_game_box
     global level_game_box
     global high_score
+    global title_screen
 
 
     if game_on is False:
