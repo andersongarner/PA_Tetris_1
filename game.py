@@ -433,7 +433,6 @@ def tick():
 
         level_game_box = uvage.from_text(text_x_val, text_y_val + 90, "Level: " + str(level), 30, [127, 127, 127])
 
-
         left = tH.board_top_left_position[0] + 600
         right = left + tH.board_width * tH.block_width
         top = tH.board_top_left_position[1]

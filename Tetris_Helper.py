@@ -73,7 +73,7 @@ class Tetrimino:
         for i in kick_translations:
             issues = False
             new_center_position[0] = self.center_position[0] + i[0]
-            new_center_position[1] = self.center_position[1] + i[1]
+            new_center_position[1] = self.center_position[1] - i[1]
             for j in range(len(self.block_positions)):
                 new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
                 new_block_positions.append(new_block_position)
