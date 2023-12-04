@@ -1,7 +1,6 @@
 import copy
 import math
 
-import ThreeD_Helper
 import uvage
 import random as r
 

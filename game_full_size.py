@@ -32,10 +32,9 @@
 import math
 import threading
 
-import ThreeD_Helper
+import ThreeD_Helper_Full_Size
 import uvage
 import Tetris_Helper_Full_Size as tH
-import ThreeD_Helper as Tdh
 import Score
 import random as r
 
@@ -64,8 +63,6 @@ frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shi
 frames_to_move_on_ground = fps * 2
 current_frames_on_ground = 0
 
-current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
-
 camera_animator = 0
 direction = 1
 
@@ -81,7 +78,6 @@ def reset_game():
     global current_frames_on_ground
     global game_over
     global held_this_turn
-    global current_shape
     global t_spin_flag
     global mini_t_spin_flag
     global board
@@ -107,8 +103,6 @@ def reset_game():
     frames_to_move_on_ground = 35
     current_frames_on_ground = 0
 
-    current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
-
     game_over = False
     held_this_turn = False
     t_spin_flag = False
@@ -119,7 +113,7 @@ def reset_game():
     milestone = 10
     number_of_lines_cleared = 0
 
-    my_board_model = ThreeD_Helper.get_three_d_board(board)
+    my_board_model = ThreeD_Helper_Full_Size.get_three_d_board(board)
 
     score = 0
     b2b = False
@@ -186,8 +180,8 @@ def get_input(m_t, f_a_e_i):
                 mini_t_spin_flag = False
                 t_spin_flag = False
                 m_t = tH.get_next_tetrimino()
-                current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino)
-                my_board_model = ThreeD_Helper.get_three_d_board(board)
+                current_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(my_tetrimino)
+                my_board_model = ThreeD_Helper_Full_Size.get_three_d_board(board)
             elif x == 0:
                 combo = 0
             else:
@@ -233,7 +227,7 @@ def get_input(m_t, f_a_e_i):
         if f_a_e_i["left shift"] == 0:
             held_this_turn = True
             m_t = tH.swap_hold_tetrimino(my_tetrimino)
-            current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(m_t)
+            current_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(m_t)
             f_a_e_i["left shift"] += 1
         elif f_a_e_i["left shift"] == 5:
             f_a_e_i["left shift"] = 0
@@ -244,7 +238,7 @@ def get_input(m_t, f_a_e_i):
     return m_t
 
 
-def get_camera_input(my_camera: ThreeD_Helper.Camera):
+def get_camera_input(my_camera: ThreeD_Helper_Full_Size.Camera):
     if uvage.is_pressing("left arrow"):
         if my_camera.position[0] >= 700:
             my_camera.position[0] -= 5
@@ -272,13 +266,13 @@ def get_camera_input(my_camera: ThreeD_Helper.Camera):
     return my_camera
 
 
-my_cam = Tdh.Camera()
+my_cam = ThreeD_Helper_Full_Size.Camera()
 
 reset_game()
 
-current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino.get_copy())
+current_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(my_tetrimino.get_copy())
 
-my_board_model = ThreeD_Helper.get_three_d_board(board)
+my_board_model = ThreeD_Helper_Full_Size.get_three_d_board(board)
 
 
 my_cam.position = [tH.scene_width / 2, tH.scene_height / 2, 0]
@@ -290,7 +284,7 @@ game_on = False
 image = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "tetris-logo.png")
 title_screen_tetrimino_model_list = []
 for i in range(30):
-    new_model = ThreeD_Helper.get_whole_three_d_tetrimino(tH.generate_new_tetrimino())
+    new_model = ThreeD_Helper_Full_Size.get_whole_three_d_tetrimino(tH.generate_new_tetrimino())
     new_model.position = [r.randint(0, tH.scene_width), r.randint(0, tH.scene_height), r.randint(-tH.scene_width, tH.scene_width)]
     new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
     title_screen_tetrimino_model_list.append(new_model)
@@ -308,7 +302,6 @@ def tick():
     global current_frames_on_ground
     global game_over
     global held_this_turn
-    global current_shape
     global t_spin_flag
     global mini_t_spin_flag
     global timer
@@ -378,7 +371,7 @@ def tick():
         while fancy_color[2] > 255:
             fancy_color[2] = 0
         number_of_lines_cleared = 0
-        current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino.get_copy())
+        current_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(my_tetrimino.get_copy())
 
         timer += 1 / fps
 
@@ -405,8 +398,8 @@ def tick():
                 t_spin_flag = False
                 total_lines_cleared += number_of_lines_cleared
                 my_tetrimino = tH.get_next_tetrimino()
-                current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino)
-                my_board_model = ThreeD_Helper.get_three_d_board(board)
+                current_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(my_tetrimino)
+                my_board_model = ThreeD_Helper_Full_Size.get_three_d_board(board)
                 held_this_turn = False
                 game_over = my_tetrimino.check_game_over(board)
                 frames_after_each_input["space"] += 1
@@ -450,8 +443,8 @@ def tick():
                 mini_t_spin_flag = False
                 t_spin_flag = False
                 my_tetrimino = tH.get_next_tetrimino()
-                current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino)
-                my_board_model = ThreeD_Helper.get_three_d_board(board)
+                current_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(my_tetrimino)
+                my_board_model = ThreeD_Helper_Full_Size.get_three_d_board(board)
                 held_this_turn = False
                 game_over = my_tetrimino.check_game_over(board)
                 current_frames_on_ground = 0
@@ -483,8 +476,8 @@ def tick():
         bg_top_right = [right, top, 0]
         bg_bottom_right = [right, bottom, 0]
         bg_bottom_left = [left, bottom, 0]
-        background_quad = ThreeD_Helper.Quad([bg_top_left, bg_top_right, bg_bottom_right, bg_bottom_left], [255, 255, 255])
-        background_model = ThreeD_Helper.Model()
+        background_quad = ThreeD_Helper_Full_Size.Quad([bg_top_left, bg_top_right, bg_bottom_right, bg_bottom_left], [255, 255, 255])
+        background_model = ThreeD_Helper_Full_Size.Model()
         background_model.add_quad(background_quad)
         for i in background_model.get_game_box_list(my_cam):
             camera.draw(i)
@@ -500,7 +493,7 @@ def tick():
             0] + tH.block_width / 2 + 600
         model_y = ghost_tetrimino.center_position[1] * tH.block_width + tH.board_top_left_position[
             1] - tH.board_extra_space * tH.block_width + tH.block_width / 2
-        ghost_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(ghost_tetrimino)
+        ghost_tetrimino_model = ThreeD_Helper_Full_Size.get_three_d_tetrimino(ghost_tetrimino)
         for i in range(len(ghost_tetrimino_model)):
             ghost_tetrimino_model[i].position = [model_x, model_y, 0]
 

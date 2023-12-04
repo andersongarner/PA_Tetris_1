@@ -1,6 +1,6 @@
 import math
 
-import Tetris_Helper as tH
+import Tetris_Helper_Full_Size as tH
 import uvage
 import copy
 
