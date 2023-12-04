@@ -557,6 +557,12 @@ def tick():
             frames_between_move_down -= 10
 
     elif game_on:
+        if tH.compare_score(score, high_score):
+            high_score = score
+            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100,"NEW HIGH SCORE! " + str(score), 60, [127,127, 127]))
+        else:
+            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100, "YOUR SCORE: " + str(score), 60, [127, 127, 127]))
+
         camera.draw(uvage.from_text(1000, 600, "PRESS R TO RESTART...", 60, [127, 127, 127]))
         camera.display()
         if uvage.is_pressing("r"):
