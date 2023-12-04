@@ -469,6 +469,9 @@ def tick():
 
         level_game_box = uvage.from_text(text_x_val, text_y_val + 90, "Level: " + str(level), 30, [127, 127, 127])
 
+        high_score_box = uvage.from_text(my_cam.position[0] + 50, my_cam.position[1] + tH.scene_width / 2, "SCORE TO BEAT: " + str(high_score), 30, [127, 127, 127])
+
+
         left = tH.board_top_left_position[0] + 600
         right = left + tH.board_width * tH.block_width
         top = tH.board_top_left_position[1]

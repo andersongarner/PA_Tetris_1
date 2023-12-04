@@ -16,6 +16,13 @@ blank_color = [255, 255, 255]
 block_width = 40
 
 
+def get_high_score():
+    f = open('tetris_data.txt', 'r')
+    high_score = int(f.readline())
+    f.close()
+    return high_score
+
+
 def rotate_point_around(point0, point1, direction="clockwise"):  # Rotate point0 around point1
     x = point0[0] - point1[0]
     y = point0[1] - point1[1]
