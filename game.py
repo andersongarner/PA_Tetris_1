@@ -39,7 +39,7 @@ import ThreeD_Helper as Tdh
 import Score
 import random as r
 
-
+#Global setup
 board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height)]
 camera = uvage.Camera(tH.scene_width, tH.scene_height)
 my_tetrimino = tH.generate_new_tetrimino()
@@ -69,7 +69,7 @@ current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_po
 camera_animator = 0
 direction = 1
 
-
+#resets global variables
 def reset_game():
     global my_tetrimino
     global animation_timer
@@ -128,6 +128,7 @@ def reset_game():
     camera_animator = 0
     direction = 1
 
+#easy to call to get input
 def get_input(m_t, f_a_e_i):
     global held_this_turn
     global t_spin_flag
@@ -141,7 +142,9 @@ def get_input(m_t, f_a_e_i):
     global b2b
     global combo
     global number_of_lines_cleared
-
+    global wallpaper
+    global title_screen
+    #each if statement uses a timer to have a gap between presses
     if uvage.is_pressing("a"):
         t_spin_flag = False
         mini_t_spin_flag = False
@@ -241,10 +244,10 @@ def get_input(m_t, f_a_e_i):
         f_a_e_i["left shift"] = 0
     return m_t
 
-
+#moves the camera
 def get_camera_input(my_camera: ThreeD_Helper.Camera):
     if uvage.is_pressing("left arrow"):
-        if my_camera.position[0] >= 700:
+        if my_camera.position[0] >= 0:
             my_camera.position[0] -= 5
     if uvage.is_pressing("up arrow"):
         if my_camera.position[1] > 0:
@@ -269,7 +272,7 @@ def get_camera_input(my_camera: ThreeD_Helper.Camera):
             my_camera.rotate_degrees(0, 2, 0)
     return my_camera
 
-
+#setting up objects to use
 my_cam = Tdh.Camera()
 
 reset_game()
@@ -285,17 +288,23 @@ fancy_color = [0, 127, 255]
 
 game_on = False
 
-image = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "tetris-logo.png")
+#creates title screen resources
+image = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "tetris-logo-small.png")
 title_screen_tetrimino_model_list = []
 for i in range(30):
     new_model = ThreeD_Helper.get_whole_three_d_tetrimino(tH.generate_new_tetrimino())
-    new_model.position = [r.randint(my_cam.position[0] - 1000, my_cam.position[0] + 1000), r.randint(my_cam.position[1] - 500, my_cam.position[1] + 500), r.randint(-1000, 1000)]
+    new_model.position = [r.randint(my_cam.position[0] - tH.scene_width / 2, my_cam.position[0] + tH.scene_width / 2), r.randint(my_cam.position[1] - tH.scene_height / 2, my_cam.position[1] + tH.scene_height / 2), r.randint(-tH.scene_width / 2, tH.scene_width / 2)]
     new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
     title_screen_tetrimino_model_list.append(new_model)
 
 wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.jpg")
 title_screen = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.png")
 camera_add = [0, 0]
+
+t_g_b = None
+score_game_box = None
+level_game_box = None
+high_score = tH.get_high_score()
 
 def tick():
     global my_tetrimino
@@ -326,8 +335,15 @@ def tick():
     global camera_animator
     global direction
     global camera_add
+    global t_g_b
+    global score_game_box
+    global level_game_box
+    global high_score
+
 
     if game_on is False:
+        #if game on is false, game has not started yet
+        #used for titlescreen
         camera.clear([0, 0, 0])
         camera.draw(title_screen)
         for i in title_screen_tetrimino_model_list:
@@ -336,16 +352,19 @@ def tick():
                 camera.draw(j)
         my_cam.rotate_degrees(0.25, 0.25, 0.25)
 
-        text = uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 + 400, "Press Enter to Start...", 60, [255, 255, 255])
+        text = uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 + 300, "Press Enter to Start...", 60, [255, 255, 255])
         camera.draw(text)
         camera.draw(image)
         camera.display()
         if uvage.is_pressing("return"):
+            #starts the game
+            #sets some defaults
             my_cam.rotation = [0, 0, 0]
-            my_cam.position = [tH.scene_width / 2, tH.scene_height / 2, 0]
+            my_cam.position = [tH.scene_width / 2 - 100, tH.scene_height / 2 + 50, 0]
             game_on = True
             camera_add = [0, 0]
             for i in range(0, 255 * 2, 1):
+                #fade transition
                 camera.clear([i // 15, i // 15, i // 5])
                 x = uvage.from_color(tH.scene_width / 2 - 50, tH.scene_height / 2, [i // 2, i // 2, i // 2], tH.block_width * tH.board_width, tH.block_width * (tH.board_height - tH.board_extra_space))
                 camera.draw(x)
@@ -353,6 +372,7 @@ def tick():
             my_cam.rotate_degrees(0, 0, 0)
 
     if not game_over and game_on:
+        #at the start of each tick this rotates the board
         my_cam.rotation[0] -= camera_add[0]
         my_cam.rotation[1] -= camera_add[1]
         camera_animator += math.pi / 180
@@ -385,6 +405,7 @@ def tick():
         my_tetrimino = get_input(my_tetrimino, frames_after_each_input)
 
         if uvage.is_pressing("space"):
+            #hard drop procedure
             if frames_after_each_input["space"] == 0:
                 score += int(2 * (my_tetrimino.get_ghost(board).center_position[1] - my_tetrimino.center_position[1]))
                 my_tetrimino.center_position[0] = my_tetrimino.get_ghost(board).center_position[0]
@@ -469,6 +490,8 @@ def tick():
 
         level_game_box = uvage.from_text(text_x_val, text_y_val + 90, "Level: " + str(level), 30, [127, 127, 127])
 
+        high_score_box = uvage.from_text(my_cam.position[0] + 50, my_cam.position[1] + tH.scene_width / 2, "SCORE TO BEAT: " + str(high_score), 30, [127, 127, 127])
+
         left = tH.board_top_left_position[0] + 600
         right = left + tH.board_width * tH.block_width
         top = tH.board_top_left_position[1]
@@ -489,6 +512,7 @@ def tick():
         for i in current_tetrimino_model:
             i.position = [model_x, model_y, 0]
 
+        #ghost model
         ghost_tetrimino = my_tetrimino.get_ghost(board)
         model_x = ghost_tetrimino.center_position[0] * tH.block_width + tH.board_top_left_position[
             0] + tH.block_width / 2 + 600
@@ -498,6 +522,8 @@ def tick():
         for i in range(len(ghost_tetrimino_model)):
             ghost_tetrimino_model[i].position = [model_x, model_y, 0]
 
+        #displays the correct faces based on camera pos
+        #helps with performance
         if 0 <= my_cam.rotation[0] < math.pi:
             for i in my_board_model[1].get_game_box_list(my_cam):
                 camera.draw(i)
@@ -532,9 +558,11 @@ def tick():
             camera.draw(i)
         for i in current_tetrimino_model[0].get_game_box_list(my_cam):
             camera.draw(i)
+        #draws the labels on the screen
         camera.draw(t_g_b)
         camera.draw(score_game_box)
         camera.draw(level_game_box)
+        camera.draw(high_score_box)
 
         tH.draw_next(my_cam, camera)
         tH.draw_hold(my_cam, camera)
@@ -545,14 +573,23 @@ def tick():
         camera.display()
         animation_timer += 1
 
+        #increases level every ten lines
         if total_lines_cleared >= milestone:
             milestone += 10
             level += 1
             frames_between_move_down -= 10
 
+    #if game is over
     elif game_on:
-        camera.draw(uvage.from_text(1000, 600, "PRESS R TO RESTART...", 60, [127, 127, 127]))
+        if tH.compare_score(score, high_score):
+            high_score = score
+            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100,"NEW HIGH SCORE! " + str(score), 60, [127,127, 127]))
+        else:
+            camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 - 100, "YOUR SCORE: " + str(score), 60, [127, 127, 127]))
+
+        camera.draw(uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 + 100, "PRESS R TO RESTART...", 60, [127, 127, 127]))
         camera.display()
+
         if uvage.is_pressing("r"):
             reset_game()
 

@@ -1,16 +1,4 @@
-
-
-def get_nintento_scoring(n, level):
-    if n == 1:
-        return 40 * (level + 1)
-    if n == 2:
-        return 100 * (level + 1)
-    if n == 3:
-        return 300 * (level + 1)
-    if n == 4:
-        return 1200 * (level + 1)
-
-
+#keeps track of combos, tspins, back to backs, and other scoring information
 def get_guideline_scoring(n, level, b2b, combo=0, t_spin=False, mini_t_spin=False):
     new_score = 0
     if not mini_t_spin:
@@ -68,5 +56,3 @@ def get_guideline_scoring(n, level, b2b, combo=0, t_spin=False, mini_t_spin=Fals
         new_score += combo * 50 * (level+1)
 
     return [new_score, combo, b2b]
-
-   # def write_score(final_score):

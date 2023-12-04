@@ -5,15 +5,22 @@ import ThreeD_Helper
 import uvage
 import random as r
 
-
+#sets game defaults
 board_width = 10
 board_height = 25
 board_extra_space = 5
-scene_width = 1920
-scene_height = 1080
-board_top_left_position = [100, 100]
+scene_width = 600
+scene_height = 800
+board_top_left_position = [-400, 50]
 blank_color = [255, 255, 255]
-block_width = 40
+block_width = 30
+
+
+def get_high_score():
+    f = open('tetris_data.txt', 'r')
+    high_score = int(f.readline())
+    f.close()
+    return high_score
 
 
 def rotate_point_around(point0, point1, direction="clockwise"):  # Rotate point0 around point1
@@ -32,7 +39,7 @@ def rotate_point_around(point0, point1, direction="clockwise"):  # Rotate point0
     new_y = (x * sin - y * cos) + point1[1]
     return [new_x, new_y]
 
-
+#object for tetrimino pieces
 class Tetrimino:
     center_position = [5, 2]
     block_positions = []
@@ -46,6 +53,7 @@ class Tetrimino:
         self.offset = [[]]
 
     def check_game_over(self, board):
+        #sees if new piece overlaps board
         for i in self.block_positions:
             if board[int(i[1] + self.center_position[1])][int(i[0] + self.center_position[0])] != blank_color:
                 return True
@@ -54,9 +62,11 @@ class Tetrimino:
         return False
 
     def check_t_spin(self, board):
+        #checks all pieces for tspin
         return [False, False]
 
     def rotate(self, board, direction="clockwise"):  # Returns [Rotation Successful, t-spin, mini t-spin]
+        #rotates the piece based on input
         new_block_positions = []
         new_center_position = copy.deepcopy(self.center_position)
         issues = False
@@ -67,11 +77,13 @@ class Tetrimino:
             else:
                 c_r += 1
             kick_translations = []
+            #creates kick translations, look it up
             for i in range(len(self.offset[self.current_rotation])):
                 x = self.offset[self.current_rotation][i][0] - self.offset[c_r][i][0]
                 y = self.offset[self.current_rotation][i][1] - self.offset[c_r][i][1]
                 kick_translations.append([x, y])
             for i in kick_translations:
+                #tries moving piece into each possible location until one works
                 issues = False
                 new_center_position[0] = self.center_position[0] + i[0]
                 new_center_position[1] = self.center_position[1] - i[1]
@@ -100,11 +112,13 @@ class Tetrimino:
             my_list = self.check_t_spin(board)
             return [True, my_list[0], my_list[1]]
         elif direction == "counter":
+            #same thing but counter clockwise
             if c_r - 1 < 0:
                 c_r = 3
             else:
                 c_r -= 1
             kick_translations = []
+
             for i in range(len(self.offset[self.current_rotation])):
                 x = self.offset[self.current_rotation][i][0] - self.offset[c_r][i][0]
                 y = self.offset[self.current_rotation][i][1] - self.offset[c_r][i][1]
@@ -142,6 +156,8 @@ class Tetrimino:
 
 
     def move_x(self, board, direction=""):
+        #tries moving
+        #moves if valid
         move_val = 0
         if direction == "left":
             move_val = -1
@@ -170,6 +186,8 @@ class Tetrimino:
         return new_block_positions
 
     def move_down(self, board):
+        #tries moving down
+        #if it can it will, if it cant it will add to the board
         for i in self.block_positions:
             x = int(i[0] + self.center_position[0])
             y = int(i[1] + self.center_position[1]) + 1
@@ -181,12 +199,14 @@ class Tetrimino:
         return -1  # Returns -1 if move_down successfully moved tetrimino down
 
     def add_to_board(self, board):
+        #add pieces to board when they cant move down
         for i in self.block_positions:
             x = int(i[0] + self.center_position[0])
             y = int(i[1] + self.center_position[1])
             board[y][x] = self.color
 
     def get_copy(self):
+        #returns copies
         my_copy = Tetrimino()
         my_copy.block_positions = copy.deepcopy(self.block_positions)
         my_copy.color = copy.deepcopy(self.color)
@@ -195,9 +215,11 @@ class Tetrimino:
         return my_copy
 
     def get_ghost(self, board):
+        #returns for ghost tetriminoes
         current_y = self.center_position[1]
         loop = current_y
         while loop < board_height:
+            #moves piece down until it cant anymore
             current_y += 1
             loop = current_y
             for i in self.block_positions:
@@ -206,6 +228,7 @@ class Tetrimino:
                 if 0 <= x < board_width and y >= board_height or board[y][x] != blank_color:
                     loop = 100
                     continue
+        #creates the ghost object
         ghost = Tetrimino()
         new_color = [(self.color[0] + 3 * blank_color[0]) / 4, (self.color[1] + 3 * blank_color[1]) / 4, (self.color[2] + 3 * blank_color[2]) / 4]
         ghost.color = new_color
@@ -233,13 +256,14 @@ class IBlock(Tetrimino):
 
     
 class TBlock(Tetrimino):
-    
+    #T block class
     def __init__(self):
         super().__init__()
         self.color = [125, 0, 255]
         self.set_defaults()
 
     def check_t_spin(self, board):  # returns [t-spin, mini t-spin]
+        #uses polymorphism to overrule default method
         # check mini t-spin
         # check true t-spin
         t_spin = False
@@ -303,7 +327,7 @@ class TBlock(Tetrimino):
 
         
 class ZBlock(Tetrimino):
-    
+    #see tblock comment
     def __init__(self):
         super().__init__()
         self.color = [255, 0, 0]
@@ -320,7 +344,7 @@ class ZBlock(Tetrimino):
 
 
 class SBlock(Tetrimino):
-
+    # see tblock comment
     def __init__(self):
         super().__init__()
         self.color = [0, 255, 0]
@@ -337,7 +361,7 @@ class SBlock(Tetrimino):
 
 
 class LBlock(Tetrimino):
-    
+    # see tblock comment
     def __init__(self):
         super().__init__()
         self.color = [255, 165, 0]
@@ -354,7 +378,7 @@ class LBlock(Tetrimino):
 
 
 class JBlock(Tetrimino):
-
+    # see tblock comment
     def __init__(self):
         super().__init__()
         self.color = [0, 0, 255]
@@ -371,7 +395,7 @@ class JBlock(Tetrimino):
 
 
 class OBlock(Tetrimino):
-    
+    # see tblock comment
     def __init__(self):
         super().__init__()
         self.color = [255, 255, 0]
@@ -388,6 +412,7 @@ class OBlock(Tetrimino):
 
 
 def generate_new_tetrimino():
+    #chooses next tetrimino randomly
     rand = r.randint(1, 7)
     if rand == 1:
         return IBlock()
@@ -404,21 +429,23 @@ def generate_new_tetrimino():
     elif rand == 7:
         return OBlock()
 
-
+#next tetrimino on deck
 next_tetrimino = generate_new_tetrimino()
 
 
 def get_next_tetrimino():
+    #returns the stored tetrimino, and gets a new tetrimino on deck
     global next_tetrimino
     temp = copy.deepcopy(next_tetrimino)
     next_tetrimino = generate_new_tetrimino()
     return temp
 
-
+#variable for the held tetrimino
 hold_tetrimino = None
 
 
 def swap_hold_tetrimino(my_tetrimino):
+    #swaps the held tetrimino with current tetrimino in play
     global hold_tetrimino
     if hold_tetrimino is None:
         my_tetrimino.set_defaults()
@@ -433,6 +460,8 @@ def swap_hold_tetrimino(my_tetrimino):
 
 
 def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
+    #draws the board in 2d
+    #NOT IN USE
     for i in range(board_height - board_extra_space):
         y = board_top_left_position[1] + i * block_width + block_width / 2
         for j in range(len(board[i - board_extra_space])):
@@ -469,27 +498,30 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
 
 
 def draw_next(camera, uvage_camera: uvage.Camera):
+    #see 2d board comment
     x = uvage.from_text(camera.position[0] - 325 + 600, camera.position[1] - 250, "NEXT", 40, [127, 127, 127])
     uvage_camera.draw(x)
     for i in next_tetrimino.get_block_positions():  # Draws the next tetrimino to the right of the board
-        x = i[0] * block_width + camera.position[0] - 550 + 600
-        y = i[1] * block_width + camera.position[1] - 300
+        x = i[0] * block_width + camera.position[0] + 125
+        y = i[1] * block_width + camera.position[1] - 275
         game_box = uvage.from_color(x, y, next_tetrimino.color, block_width, block_width)
         uvage_camera.draw(game_box)
 
 
 def draw_hold(camera, uvage_camera: uvage.Camera):
+    #see 2d board comment
     x = uvage.from_text(camera.position[0] - 325 + 600, camera.position[1] - 75, "HOLD", 40, [127, 127, 127])
     uvage_camera.draw(x)
     if hold_tetrimino is not None:
         for i in hold_tetrimino.get_block_positions():  # Draws the hold tetrimino to the right of the board
-            x = i[0] * block_width + camera.position[0] - 550 + 600
+            x = i[0] * block_width + camera.position[0] + 125
             y = i[1] * block_width + camera.position[1] - 125
             game_box = uvage.from_color(x, y, hold_tetrimino.color, block_width, block_width)
             uvage_camera.draw(game_box)
 
 
 def check_clear_lines(board):
+    #checks how many lines cleared
     number_of_lines_cleared = 0
     for i in range(len(board)):
         csf = True
@@ -507,3 +539,12 @@ def check_clear_lines(board):
 
 def get_radians(degrees):
     return degrees * math.pi / 180
+
+def compare_score(player_score, high_score):
+    #compares score, if higher than score in file, overwrites file
+    if player_score > high_score:
+        g = open('tetris_data.txt', 'w')
+        g.write(str(player_score))
+        return True
+    else:
+        return False
