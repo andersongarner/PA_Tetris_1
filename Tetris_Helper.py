@@ -514,3 +514,12 @@ def check_clear_lines(board):
 
 def get_radians(degrees):
     return degrees * math.pi / 180
+
+def compare_score(player_score, high_score):
+    #compares score, if higher than score in file, overwrites file
+    if player_score > high_score:
+        g = open('tetris_data.txt', 'w')
+        g.write(str(player_score))
+        return True
+    else:
+        return False
