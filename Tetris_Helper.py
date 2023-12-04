@@ -61,43 +61,85 @@ class Tetrimino:
         new_center_position = copy.deepcopy(self.center_position)
         issues = False
         c_r = self.current_rotation
-        if c_r + 1 >= 4:
-            c_r = 0
-        else:
-            c_r += 1
-        kick_translations = []
-        for i in range(len(self.offset[self.current_rotation])):
-            x = self.offset[self.current_rotation][i][0] - self.offset[c_r][i][0]
-            y = self.offset[self.current_rotation][i][1] - self.offset[c_r][i][1]
-            kick_translations.append([x, y])
-        for i in kick_translations:
-            issues = False
-            new_center_position[0] = self.center_position[0] + i[0]
-            new_center_position[1] = self.center_position[1] - i[1]
-            for j in range(len(self.block_positions)):
-                new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
-                new_block_positions.append(new_block_position)
-                new_x = int(new_block_position[0] + new_center_position[0])
-                new_y = int(new_block_position[1] + new_center_position[1])
-                while new_x < 0:
-                    new_center_position[0] += 1
-                    new_x += 1
-                while new_x >= board_width:
-                    new_center_position[0] -= 1
-                    new_x -= 1
-                # ("new_center:", new_center_position)
-                if new_x < 0 or new_x > board_width or new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
-                    issues = True
+        if direction == "clockwise":
+            if c_r + 1 >= 4:
+                c_r = 0
+            else:
+                c_r += 1
+            kick_translations = []
+            for i in range(len(self.offset[self.current_rotation])):
+                x = self.offset[self.current_rotation][i][0] - self.offset[c_r][i][0]
+                y = self.offset[self.current_rotation][i][1] - self.offset[c_r][i][1]
+                kick_translations.append([x, y])
+            for i in kick_translations:
+                issues = False
+                new_center_position[0] = self.center_position[0] + i[0]
+                new_center_position[1] = self.center_position[1] - i[1]
+                for j in range(len(self.block_positions)):
+                    new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
+                    new_block_positions.append(new_block_position)
+                    new_x = int(new_block_position[0] + new_center_position[0])
+                    new_y = int(new_block_position[1] + new_center_position[1])
+                    while new_x < 0:
+                        new_center_position[0] += 1
+                        new_x += 1
+                    while new_x >= board_width:
+                        new_center_position[0] -= 1
+                        new_x -= 1
+                    # ("new_center:", new_center_position)
+                    if new_x < 0 or new_x > board_width or new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
+                        issues = True
+                        break
+                if not issues:
                     break
-            if not issues:
-                break
-        if issues:
+            if issues:
+                return [False, False, False]
+            self.center_position = new_center_position
+            self.block_positions = new_block_positions
+            self.current_rotation = c_r
+            my_list = self.check_t_spin(board)
+            return [True, my_list[0], my_list[1]]
+        elif direction == "counter":
+            if c_r - 1 < 0:
+                c_r = 3
+            else:
+                c_r -= 1
+            kick_translations = []
+            for i in range(len(self.offset[self.current_rotation])):
+                x = self.offset[self.current_rotation][i][0] - self.offset[c_r][i][0]
+                y = self.offset[self.current_rotation][i][1] - self.offset[c_r][i][1]
+                kick_translations.append([x, y])
+            for i in kick_translations:
+                issues = False
+                new_center_position[0] = self.center_position[0] + i[0]
+                new_center_position[1] = self.center_position[1] - i[1]
+                for j in range(len(self.block_positions)):
+                    new_block_position = rotate_point_around(self.block_positions[j], [0, 0], direction)
+                    new_block_positions.append(new_block_position)
+                    new_x = int(new_block_position[0] + new_center_position[0])
+                    new_y = int(new_block_position[1] + new_center_position[1])
+                    while new_x < 0:
+                        new_center_position[0] += 1
+                        new_x += 1
+                    while new_x >= board_width:
+                        new_center_position[0] -= 1
+                        new_x -= 1
+                    # ("new_center:", new_center_position)
+                    if new_x < 0 or new_x > board_width or new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
+                        issues = True
+                        break
+                if not issues:
+                    break
+            if issues:
+                return [False, False, False]
+            self.center_position = new_center_position
+            self.block_positions = new_block_positions
+            self.current_rotation = c_r
+            my_list = self.check_t_spin(board)
+            return [True, my_list[0], my_list[1]]
+        else:
             return [False, False, False]
-        self.center_position = new_center_position
-        self.block_positions = new_block_positions
-        self.current_rotation = c_r
-        my_list = self.check_t_spin(board)
-        return [True, my_list[0], my_list[1]]
+
 
     def move_x(self, board, direction=""):
         move_val = 0

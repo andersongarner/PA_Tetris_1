@@ -7,6 +7,7 @@
 # |                                                                / CHECKPOINT 2: CHANGED TO WASD CONTROL SCHEME      |
 # |                   CONTROLS                                                                             IMPLEMENTED |
 # |                    W - Rotate block clockwise                                                                      |
+# |                    C - Rotate block counter-clockwise                                                              |
 # |                    A - Move block left                                                                             |
 # |                    S - Soft drop                                                                                   |
 # |                    D - Move block right                                                                            |
@@ -65,6 +66,9 @@ current_frames_on_ground = 0
 
 current_shape = Tdh.Cube([tH.board_width * tH.block_width + tH.board_top_left_position[0] + 500, 500, 500], 100)
 
+camera_animator = 0
+direction = 1
+
 
 def reset_game():
     global my_tetrimino
@@ -88,6 +92,8 @@ def reset_game():
     global b2b
     global combo
     global number_of_lines_cleared
+    global camera_animator
+    global direction
 
     board = [[tH.blank_color for i in range(tH.board_width)] for j in range(tH.board_height + tH.board_extra_space)]
     my_tetrimino = tH.generate_new_tetrimino()
@@ -95,7 +101,7 @@ def reset_game():
     # ---- ANIMATION TIMERS ----
     animation_timer = 0
     frames_between_move_down = 101
-    frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
+    frames_after_each_input = {"a": 0, "d": 0, "w": 0, "c": 0, "s": 0, "space": 0, "left shift": 0}
     frames_to_move_on_ground = 35
     current_frames_on_ground = 0
 
@@ -119,6 +125,8 @@ def reset_game():
 
     tH.hold_tetrimino = None
     tH.next_tetrimino = tH.generate_new_tetrimino()
+    camera_animator = 0
+    direction = 1
 
 def get_input(m_t, f_a_e_i):
     global held_this_turn
@@ -204,6 +212,19 @@ def get_input(m_t, f_a_e_i):
             f_a_e_i["w"] += 1
     else:
         f_a_e_i["w"] = 0
+    if uvage.is_pressing("c"):
+        if f_a_e_i["c"] == 0:
+            l_my = m_t.rotate(board, "counter")
+            if l_my[0]:
+                for i in current_tetrimino_model:
+                    i.rotate_degrees(0, 0, 90)
+                t_spin_flag = l_my[1]
+                mini_t_spin_flag = l_my[2]
+            f_a_e_i["c"] += 1
+        elif f_a_e_i["c"] == 5:
+            f_a_e_i["c"] = 0
+        else:
+            f_a_e_i["c"] += 1
     if uvage.is_pressing("left shift") and not held_this_turn:
         t_spin_flag = False
         mini_t_spin_flag = False
@@ -235,16 +256,16 @@ def get_camera_input(my_camera: ThreeD_Helper.Camera):
         if my_camera.position[1] < tH.scene_height:
             my_camera.position[1] += 5
     if uvage.is_pressing("i"):
-        if my_camera.rotation[0] < math.pi / 6:
+        if my_camera.rotation[0] - camera_add[0] < math.pi / 8:
             my_camera.rotate_degrees(2, 0, 0)
     if uvage.is_pressing("j"):
-        if my_camera.rotation[1] > -math.pi / 6:
+        if my_camera.rotation[1] - camera_add[1] > -math.pi / 8:
             my_camera.rotate_degrees(0, -2, 0)
     if uvage.is_pressing("k"):
-        if my_camera.rotation[0] > -math.pi / 6:
+        if my_camera.rotation[0] - camera_add[0] > -math.pi / 8:
             my_camera.rotate_degrees(-2, 0, 0)
     if uvage.is_pressing("l"):
-        if my_camera.rotation[1] < math.pi / 6:
+        if my_camera.rotation[1] - camera_add[1] < math.pi / 8:
             my_camera.rotate_degrees(0, 2, 0)
     return my_camera
 
@@ -266,7 +287,7 @@ game_on = False
 
 image = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "tetris-logo.png")
 title_screen_tetrimino_model_list = []
-for i in range(25):
+for i in range(30):
     new_model = ThreeD_Helper.get_whole_three_d_tetrimino(tH.generate_new_tetrimino())
     new_model.position = [r.randint(my_cam.position[0] - 1000, my_cam.position[0] + 1000), r.randint(my_cam.position[1] - 500, my_cam.position[1] + 500), r.randint(-1000, 1000)]
     new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
@@ -274,6 +295,7 @@ for i in range(25):
 
 wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.jpg")
 title_screen = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.png")
+camera_add = [0, 0]
 
 def tick():
     global my_tetrimino
@@ -301,6 +323,9 @@ def tick():
     global number_of_lines_cleared
     global game_on
     global title_screen_tetrimino_model_list
+    global camera_animator
+    global direction
+    global camera_add
 
     if game_on is False:
         camera.clear([0, 0, 0])
@@ -319,13 +344,24 @@ def tick():
             my_cam.rotation = [0, 0, 0]
             my_cam.position = [tH.scene_width / 2, tH.scene_height / 2, 0]
             game_on = True
+            camera_add = [0, 0]
             for i in range(0, 255 * 2, 1):
-                camera.clear([i // 6, i // 6, i // 2])
+                camera.clear([i // 15, i // 15, i // 5])
                 x = uvage.from_color(tH.scene_width / 2 - 50, tH.scene_height / 2, [i // 2, i // 2, i // 2], tH.block_width * tH.board_width, tH.block_width * (tH.board_height - tH.board_extra_space))
                 camera.draw(x)
                 camera.display()
+            my_cam.rotate_degrees(0, 0, 0)
 
     if not game_over and game_on:
+        my_cam.rotation[0] -= camera_add[0]
+        my_cam.rotation[1] -= camera_add[1]
+        camera_animator += math.pi / 180
+        if camera_animator == math.pi * 2:
+            camera_animator = 0
+        camera_add[0] = -math.sin(camera_animator / 1.5) / 4
+        camera_add[1] = -math.cos(camera_animator / 1.5) / 4
+        my_cam.rotation[0] += camera_add[0]
+        my_cam.rotation[1] += camera_add[1]
 
         if frames_between_move_down <= 0:
             frames_between_move_down = 1
