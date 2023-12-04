@@ -141,7 +141,7 @@ class Model:
             camera_rotated_quad = i.get_rotated_quad(camera.position, cam_pitch, cam_yaw, cam_roll)
             camera_rotated_quad_list.append(camera_rotated_quad)
         # Sort quads by z value
-        quad_z_quicksort(rotated_quad_list, 0, len(camera_rotated_quad_list) - 1)
+        quad_z_quicksort(camera_rotated_quad_list, 0, len(camera_rotated_quad_list) - 1)
         for i in camera_rotated_quad_list:
             current_game_box = i.get_game_box()
             current_game_box.x += camera.position[0] - tH.scene_width / 2

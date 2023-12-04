@@ -271,7 +271,10 @@ for i in range(25):
     new_model.rotate_degrees(r.randint(0, 359), r.randint(0, 259), r.randint(0, 359))
     title_screen_tetrimino_model_list.append(new_model)
 
-wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.jpg")
+wallpaper = uvage.from_image(tH.scene_width / 2, tH.scene_height / 2, "wallpaper.png")
+
+direction = 1
+current_add = 0
 
 def tick():
     global my_tetrimino
@@ -319,6 +322,8 @@ def tick():
             game_on = True
 
     if not game_over and game_on:
+
+
         if frames_between_move_down <= 0:
             frames_between_move_down = 1
         fancy_color[0] += 5
