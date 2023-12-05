@@ -57,6 +57,9 @@ b2b = False
 combo = 0
 number_of_lines_cleared = 0
 
+background_quad = None
+background_model = None
+
 # ---- DEFINE ANIMATION TIMERS ----
 animation_timer = 0
 frames_between_move_down = 60
@@ -340,6 +343,8 @@ def tick():
     global level_game_box
     global high_score
     global title_screen
+    global background_quad
+    global background_model
 
 
     if game_on is False:
@@ -433,6 +438,7 @@ def tick():
         else:
             frames_after_each_input["space"] = 0
 
+        # if tetrimino is not touching blocks on board
         if not my_tetrimino.center_position[1] == my_tetrimino.get_ghost(board).center_position[1]:
             if animation_timer % (frames_between_move_down // 2) == 0:
                 number_of_lines_cleared = my_tetrimino.move_down(board)
@@ -451,7 +457,7 @@ def tick():
                     held_this_turn = False
                     game_over = my_tetrimino.check_game_over(board)
                 animation_timer = 0
-        else:
+        else: # tetrimino is on ground
             if current_frames_on_ground < frames_to_move_on_ground:
                 current_frames_on_ground += 1
             elif current_frames_on_ground == frames_to_move_on_ground:
@@ -472,6 +478,7 @@ def tick():
                 game_over = my_tetrimino.check_game_over(board)
                 current_frames_on_ground = 0
 
+        # Draw everything
         camera.clear([0, 0, 0])
         camera.draw(wallpaper)
         for i in my_board_model:
@@ -501,7 +508,7 @@ def tick():
         background_quad = ThreeD_Helper.Quad([bg_top_left, bg_top_right, bg_bottom_right, bg_bottom_left], [255, 255, 255])
         background_model = ThreeD_Helper.Model()
         background_model.add_quad(background_quad)
-        for i in background_model.get_game_box_list(my_cam):
+        for i in background_model.get_game_box_list(my_cam): # should only be the one quad idk
             camera.draw(i)
 
         model_x = my_tetrimino.center_position[0] * tH.block_width + tH.board_top_left_position[0] + tH.block_width / 2 + 600
