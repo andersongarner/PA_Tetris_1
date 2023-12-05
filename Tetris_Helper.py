@@ -98,7 +98,7 @@ class Tetrimino:
                     while new_x >= board_width:
                         new_center_position[0] -= 1
                         new_x -= 1
-                    # ("new_center:", new_center_position)
+                    # ("new_center:", new_center_position) Checks for issues
                     if new_x < 0 or new_x > board_width or new_y >= board_height or new_y < 0 or board[new_y][new_x] != blank_color:
                         issues = True
                         break
@@ -106,7 +106,7 @@ class Tetrimino:
                     break
             if issues:
                 return [False, False, False]
-            self.center_position = new_center_position
+            self.center_position = new_center_position  # moves tetrimino to valid space
             self.block_positions = new_block_positions
             self.current_rotation = c_r
             my_list = self.check_t_spin(board)
@@ -206,7 +206,7 @@ class Tetrimino:
             board[y][x] = self.color
 
     def get_copy(self):
-        #returns copies
+        # returns copy in form of new tetrimino
         my_copy = Tetrimino()
         my_copy.block_positions = copy.deepcopy(self.block_positions)
         my_copy.color = copy.deepcopy(self.color)
@@ -215,11 +215,11 @@ class Tetrimino:
         return my_copy
 
     def get_ghost(self, board):
-        #returns for ghost tetriminoes
+        # returns for ghost tetriminoes
         current_y = self.center_position[1]
         loop = current_y
         while loop < board_height:
-            #moves piece down until it cant anymore
+            # moves piece down until it cant anymore
             current_y += 1
             loop = current_y
             for i in self.block_positions:
@@ -256,14 +256,14 @@ class IBlock(Tetrimino):
 
     
 class TBlock(Tetrimino):
-    #T block class
+    # T block class
     def __init__(self):
         super().__init__()
         self.color = [125, 0, 255]
         self.set_defaults()
 
     def check_t_spin(self, board):  # returns [t-spin, mini t-spin]
-        #uses polymorphism to overrule default method
+        # uses polymorphism to overrule default method
         # check mini t-spin
         # check true t-spin
         t_spin = False
@@ -327,7 +327,7 @@ class TBlock(Tetrimino):
 
         
 class ZBlock(Tetrimino):
-    #see tblock comment
+    # see tblock comment
     def __init__(self):
         super().__init__()
         self.color = [255, 0, 0]
@@ -498,7 +498,7 @@ def draw_board(board, current_tetrimino: Tetrimino, camera: uvage.Camera):
 
 
 def draw_next(camera, uvage_camera: uvage.Camera):
-    #see 2d board comment
+    # see 2d board comment
     x = uvage.from_text(camera.position[0] - 325 + 600, camera.position[1] - 250, "NEXT", 40, [127, 127, 127])
     uvage_camera.draw(x)
     for i in next_tetrimino.get_block_positions():  # Draws the next tetrimino to the right of the board
@@ -509,7 +509,7 @@ def draw_next(camera, uvage_camera: uvage.Camera):
 
 
 def draw_hold(camera, uvage_camera: uvage.Camera):
-    #see 2d board comment
+    # see 2d board comment
     x = uvage.from_text(camera.position[0] - 325 + 600, camera.position[1] - 75, "HOLD", 40, [127, 127, 127])
     uvage_camera.draw(x)
     if hold_tetrimino is not None:
@@ -521,7 +521,7 @@ def draw_hold(camera, uvage_camera: uvage.Camera):
 
 
 def check_clear_lines(board):
-    #checks how many lines cleared
+    # checks how many lines cleared
     number_of_lines_cleared = 0
     for i in range(len(board)):
         csf = True
@@ -540,8 +540,9 @@ def check_clear_lines(board):
 def get_radians(degrees):
     return degrees * math.pi / 180
 
+
 def compare_score(player_score, high_score):
-    #compares score, if higher than score in file, overwrites file
+    # compares score, if higher than score in file, overwrites file
     if player_score > high_score:
         g = open('tetris_data.txt', 'w')
         g.write(str(player_score))

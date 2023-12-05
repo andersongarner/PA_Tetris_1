@@ -1,4 +1,4 @@
-#keeps track of combos, tspins, back to backs, and other scoring information
+# keeps track of combos, t spins, back to backs, and other scoring information
 def get_guideline_scoring(n, level, b2b, combo=0, t_spin=False, mini_t_spin=False):
     new_score = 0
     if not mini_t_spin:
