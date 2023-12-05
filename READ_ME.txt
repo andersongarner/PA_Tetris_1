@@ -9,11 +9,15 @@ If you have a 1920x1080 display, please run the game_full_size.py instead.
 In our opinion it looks a lot nicer.
 
 Also, if you are on a laptop, please plug it in, as many devices will not run
-as fast on battery, and this makes a difference for us.
+as fast on battery, and this makes a noticeable difference for us.
 
-The program runs OK on our machines, but reach out if there are issues.
-Anderson Garner - 863-712-5400
-Mac Mason -
+I have had one occurrence of an out of memory error. I think I fixed it, but
+please let me know if you encounter it again, as I don't know enough about UVAge
+to be sure.
+
+The program runs pretty decently on our machines, but reach out if there are issues.
+Anderson Garner 863-712-5400
+Mac Mason 434-249-8771
 
 THANKS!!!
 --------------------------------------------

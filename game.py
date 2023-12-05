@@ -59,7 +59,7 @@ number_of_lines_cleared = 0
 
 # ---- DEFINE ANIMATION TIMERS ----
 animation_timer = 0
-frames_between_move_down = 10
+frames_between_move_down = 60
 frames_after_each_input = {"a": 0, "d": 0, "w": 0, "s": 0, "space": 0, "left shift": 0}
 frames_to_move_on_ground = fps * 2
 current_frames_on_ground = 0
@@ -100,7 +100,7 @@ def reset_game():
 
     # ---- ANIMATION TIMERS ----
     animation_timer = 0
-    frames_between_move_down = 101
+    frames_between_move_down = 60
     frames_after_each_input = {"a": 0, "d": 0, "w": 0, "c": 0, "s": 0, "space": 0, "left shift": 0}
     frames_to_move_on_ground = 35
     current_frames_on_ground = 0
@@ -351,7 +351,7 @@ def tick():
             i.rotate_degrees(1, 1, 1)
             for j in i.get_game_box_list(my_cam):
                 camera.draw(j)
-        my_cam.rotate_degrees(0.25, 0.25, 0.25)
+        my_cam.rotate_degrees(0.3, 0.3, 0.3)
 
         text = uvage.from_text(tH.scene_width / 2, tH.scene_height / 2 + 300, "Press Enter to Start...", 60, [255, 255, 255])
         camera.draw(text)
@@ -377,7 +377,7 @@ def tick():
         my_cam.rotation[0] -= camera_add[0]
         my_cam.rotation[1] -= camera_add[1]
         camera_animator += math.pi / 180
-        if camera_animator == math.pi * 2:
+        if camera_animator >= math.pi * 2 * 1.5:
             camera_animator = 0
         camera_add[0] = -math.sin(camera_animator / 1.5) / 4
         camera_add[1] = -math.cos(camera_animator / 1.5) / 4
@@ -399,9 +399,6 @@ def tick():
         current_tetrimino_model = ThreeD_Helper.get_three_d_tetrimino(my_tetrimino.get_copy())
 
         timer += 1 / fps
-
-        if animation_timer == 360:
-            animation_timer = 0
 
         my_tetrimino = get_input(my_tetrimino, frames_after_each_input)
 
@@ -437,7 +434,7 @@ def tick():
             frames_after_each_input["space"] = 0
 
         if not my_tetrimino.center_position[1] == my_tetrimino.get_ghost(board).center_position[1]:
-            if animation_timer % frames_between_move_down == 0:
+            if animation_timer % (frames_between_move_down // 2) == 0:
                 number_of_lines_cleared = my_tetrimino.move_down(board)
                 if number_of_lines_cleared != -1:
                     if number_of_lines_cleared == 0:
@@ -578,7 +575,12 @@ def tick():
         if total_lines_cleared >= milestone:
             milestone += 10
             level += 1
-            frames_between_move_down -= 10
+            frames_between_move_down -= 5
+            print(frames_between_move_down)
+
+        if frames_between_move_down <= 0:
+            frames_between_move_down = 1
+            print(frames_between_move_down)
 
     # if game is over
     elif game_on:

@@ -6,6 +6,7 @@ import copy
 
 
 def rotate_point_around(point_0, point_1, pitch, yaw, roll):
+    # matrix math to rotate 3d
     cosa = math.cos(-roll)
     sina = math.sin(-roll)
     cosb = math.cos(yaw)
@@ -32,6 +33,7 @@ def rotate_point_around(point_0, point_1, pitch, yaw, roll):
 
 
 class Camera:
+    # class for camera object (convenient way to store position and rotation info)
     position = [0, 0, 0]
     rotation = [0, 0, 0]
 
@@ -45,6 +47,7 @@ class Camera:
 
 
 class Quad:
+    # way to assemble models out of objects so easier to get gamebox from (compared to lists i guess)
     point_list = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
     color = [0, 0, 0]
 
@@ -60,12 +63,14 @@ class Quad:
                 i[j] += xyz[j]
 
     def get_rotated_quad(self, point_0, pitch, yaw, roll):
+        # returns copy of quad after a rotation
         new_points = []
         for i in self.point_list:
             new_points.append(rotate_point_around(point_0, i, pitch, yaw, roll))
         return Quad(new_points, self.color)
 
     def get_avg(self, index):
+        # gets average z value (to draw in correct order)
         total = 0
         for i in range(len(self.point_list)):
             total += self.point_list[i][index]
@@ -79,6 +84,7 @@ class Quad:
 
 
 def partition(array: list[Quad], low, high):
+    # part of quicksort
     pivot = array[high].get_avg(2)
     i = low - 1
     for j in range(low, high):
@@ -97,6 +103,7 @@ def quad_z_quicksort(array: list[Quad], low, high):
 
 
 class Model:
+    # creates an easy to work with object for managing 3D structures
     position = [0, 0, 0]
     rotation = [0, 0, 0]  # [pitch, yaw, roll]
     quad_list: list[Quad] = []
@@ -119,10 +126,12 @@ class Model:
         self.quad_list.append(new_quad)
 
     def draw_origin(self, cam):
+        # not in use
         cam.draw(uvage.from_circle(self.position[0], self.position[1], [255, 255, 255], 5))
         cam.draw(uvage.from_circle(self.position[0], self.position[1], [0, 0, 0], 3))
 
     def get_game_box_list(self, camera: Camera):
+        # returns list of gameboxes of quads
         game_box_list = []
         pitch = self.rotation[0]
         yaw = self.rotation[1]
@@ -151,6 +160,7 @@ class Model:
 
 
 class Cube(Model):
+    # not in use, used for testing
 
     def __init__(self, position, width):
         super().__init__()
@@ -184,6 +194,7 @@ class Cube(Model):
 
 
 def get_three_d_board(board: list[list[list[int]]]):
+    # creates 3D model of board based on color information lists in 2D list
     front_model = Model()
     top_model = Model()
     right_model = Model()
@@ -239,10 +250,12 @@ def get_three_d_board(board: list[list[list[int]]]):
             back_point_list = [b_top_left_corner, b_top_right_corner, b_bottom_right_corner, b_bottom_left_corner]
             back_quad = Quad(back_point_list, board[i][j])
             back_model.add_quad(back_quad)
+    # returns different faces to only draw necessary ones for performance
     return [front_model, top_model, right_model, bottom_model, left_model, back_model]
 
 
 def get_three_d_tetrimino(my_tetrimino: tH.Tetrimino):
+    # returns 3D tetrimino model based on Tetrimino object passed to it
     front_model = Model()
     top_model = Model()
     right_model = Model()
@@ -295,11 +308,12 @@ def get_three_d_tetrimino(my_tetrimino: tH.Tetrimino):
             left_color = [(2 * my_tetrimino.color[0]) // 3, (2 * my_tetrimino.color[1]) // 3, (2 * my_tetrimino.color[2]) // 3]
             left_quad = Quad(left_point_list, left_color)
             left_model.add_quad(left_quad)
-
+    # see 3D board model comment
     return [front_model, top_model, right_model, bottom_model, left_model, back_model]
 
 
 def get_whole_three_d_tetrimino(my_tetrimino: tH.Tetrimino):
+    # same as before but only one model instead of front/back/sides etc
     new_model = Model()
     for i in my_tetrimino.block_positions:
         f_top_left_corner = [i[0] * tH.block_width - tH.block_width / 2, i[1] * tH.block_width - tH.block_width / 2, tH.block_width / 2]

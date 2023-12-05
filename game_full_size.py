@@ -100,7 +100,7 @@ def reset_game():
     animation_timer = 0
     frames_between_move_down = 101
     frames_after_each_input = {"a": 0, "d": 0, "w": 0, "c": 0, "s": 0, "space": 0, "left shift": 0}
-    frames_to_move_on_ground = 35
+    frames_to_move_on_ground = fps * 2
     current_frames_on_ground = 0
 
     game_over = False
@@ -411,7 +411,7 @@ def tick():
             frames_after_each_input["space"] = 0
 
         if not my_tetrimino.center_position[1] == my_tetrimino.get_ghost(board).center_position[1]:
-            if animation_timer % frames_between_move_down == 0:
+            if animation_timer % (frames_between_move_down // 2) == 0:
                 number_of_lines_cleared = my_tetrimino.move_down(board)
                 if number_of_lines_cleared != -1:
                     if number_of_lines_cleared == 0:
@@ -548,7 +548,11 @@ def tick():
         if total_lines_cleared >= milestone:
             milestone += 10
             level += 1
-            frames_between_move_down -= 10
+            frames_between_move_down -= 5
+
+        if frames_between_move_down <= 0:
+            frames_between_move_down = 1
+            print(frames_between_move_down)
 
     elif game_on:
         if tH.compare_score(score, high_score):
